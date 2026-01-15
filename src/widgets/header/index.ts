@@ -1,2 +1,1 @@
-export {AppHeader} from "./ui/AppHeader";
-
+export { AppHeader } from "./ui/AppHeader";
