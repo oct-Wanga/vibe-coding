@@ -8,8 +8,6 @@ import { authKeys } from "../model/keys";
 
 type LoginResponse = { ok: true } | { ok: false; message: string };
 
-type ApiError = { message: string; status: number; details?: unknown };
-
 async function loginRequest(input: LoginInput): Promise<LoginResponse> {
   const res = await fetch("/api/auth/login", {
     method: "POST",

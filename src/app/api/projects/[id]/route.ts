@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 import { findProject } from "@/entities/project";
 
-export async function GET(_req: Request, ctx: { params: { id: string } }) {
-  const { id } = await ctx.params;
+export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
 
   const project = findProject(id);
 

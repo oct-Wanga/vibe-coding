@@ -1,4 +1,4 @@
-import { PROJECT_STATUS } from "@/features/projects-filter";
+import { PROJECT_STATUS } from "@/shared/lib/projectSearchParams";
 import { getEnumParam, getStringParam } from "@/shared/lib/searchParams";
 import { ProjectsPageClient } from "@/views/projects";
 

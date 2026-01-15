@@ -1,12 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import { useProjects } from "@/entities/project";
-import type { ProjectStatus } from "@/features/projects-filter";
+import type { ProjectStatus } from "@/shared/lib/projectSearchParams";
+import { readProjectsFilters } from "@/shared/lib/projectSearchParams";
 import { Badge, Card, CardContent } from "@/shared/ui";
 
-export function ProjectsList({ q, status }: { q: string; status: ProjectStatus }) {
+export function ProjectsList({
+  initialQ,
+  initialStatus,
+}: {
+  initialQ: string;
+  initialStatus: ProjectStatus;
+}) {
+  const sp = useSearchParams();
+  const { q, status } = readProjectsFilters(sp, { q: initialQ, status: initialStatus });
+
   const projects = useProjects({
     q: q.trim() || undefined,
     status,
