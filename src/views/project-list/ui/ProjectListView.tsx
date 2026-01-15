@@ -1,5 +1,5 @@
 import {formatProjectLabel, type Project} from "@/entities/project";
-import {Button} from "@/shared/ui/Button";
+import {Button} from "@/shared/ui";
 import {AppShell} from "@/widgets/app-shell";
 import {DashboardLayout} from "@/widgets/dashboard-layout";
 
