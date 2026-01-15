@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useProjects } from "@/entities/project";
 import { setParam } from "@/shared/lib/searchParams";
+import { AppShell } from "@/widgets/app-shell";
 
 const STATUS = ["all", "active", "archived"] as const;
 type Status = (typeof STATUS)[number];
@@ -70,68 +71,70 @@ export function ProjectsPageClient({
   }, [currentStatus]);
 
   return (
-    <div className="space-y-4">
-      <header className="space-y-2">
-        <h1 className="text-xl font-semibold">Projects</h1>
+    <AppShell>
+      <div className="space-y-4">
+        <header className="space-y-2">
+          <h1 className="text-xl font-semibold">Projects</h1>
 
-        <div className="flex flex-wrap items-end gap-2">
-          <div className="space-y-1">
-            <div className="text-xs text-gray-500">Search</div>
-            <input
-              className="h-9 w-64 rounded border px-3 text-sm"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="type project name"
-            />
-          </div>
+          <div className="flex flex-wrap items-end gap-2">
+            <div className="space-y-1">
+              <div className="text-xs text-gray-500">Search</div>
+              <input
+                className="h-9 w-64 rounded border px-3 text-sm"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="type project name"
+              />
+            </div>
 
-          <div className="space-y-1">
-            <div className="text-xs text-gray-500">Status</div>
-            <select
-              className="h-9 rounded border px-3 text-sm"
-              value={status}
-              onChange={(e) => setStatus(e.target.value as Status)}
+            <div className="space-y-1">
+              <div className="text-xs text-gray-500">Status</div>
+              <select
+                className="h-9 rounded border px-3 text-sm"
+                value={status}
+                onChange={(e) => setStatus(e.target.value as Status)}
+              >
+                <option value="all">All</option>
+                <option value="active">Active</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+
+            <button
+              className="h-9 rounded bg-black px-3 text-sm text-white"
+              onClick={applyToUrl}
+              type="button"
             >
-              <option value="all">All</option>
-              <option value="active">Active</option>
-              <option value="archived">Archived</option>
-            </select>
+              Apply
+            </button>
+            <button className="h-9 rounded border px-3 text-sm" onClick={reset} type="button">
+              Reset
+            </button>
           </div>
+        </header>
 
-          <button
-            className="h-9 rounded bg-black px-3 text-sm text-white"
-            onClick={applyToUrl}
-            type="button"
-          >
-            Apply
-          </button>
-          <button className="h-9 rounded border px-3 text-sm" onClick={reset} type="button">
-            Reset
-          </button>
-        </div>
-      </header>
+        <section className="rounded-lg border p-3">
+          {projects.isLoading ? <div className="text-sm text-gray-500">Loading...</div> : null}
+          {projects.isError ? <div className="text-sm text-red-600">Failed to load</div> : null}
 
-      <section className="rounded-lg border p-3">
-        {projects.isLoading ? <div className="text-sm text-gray-500">Loading...</div> : null}
-        {projects.isError ? <div className="text-sm text-red-600">Failed to load</div> : null}
+          {projects.data ? (
+            <ul className="divide-y">
+              {projects.data.map((p) => (
+                <li key={p.id} className="flex items-center justify-between py-2">
+                  <div>
+                    <div className="text-sm font-medium">{p.name}</div>
+                    <div className="text-xs text-gray-500">{p.status}</div>
+                  </div>
 
-        {projects.data ? (
-          <ul className="divide-y">
-            {projects.data.map((p) => (
-              <li key={p.id} className="flex items-center justify-between py-2">
-                <div>
-                  <div className="text-sm font-medium">{p.name}</div>
-                  <div className="text-xs text-gray-500">{p.status}</div>
-                </div>
-
-                <Link className="text-sm underline" href={`/projects/${p.id}`}>
-                  Open
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </section>
-    </div>
+                  <Link className="text-sm underline" href={`/projects/${p.id}`}>
+                    Open
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </section>
+      </div>
+    </AppShell>
   );
 }
