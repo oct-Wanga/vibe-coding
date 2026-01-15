@@ -1,5 +1,16 @@
-import { ProjectListView } from "@/views/project-list";
+import { PROJECT_STATUS } from "@/shared/lib/projectSearchParams";
+import { getEnumParam, getStringParam } from "@/shared/lib/searchParams";
+import { ProjectsPageClient } from "@/views/projects";
 
-export default function Page() {
-  return <ProjectListView />;
+export default async function ProjectsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+
+  const q = getStringParam(sp, "q") ?? "";
+  const status = getEnumParam(sp, "status", PROJECT_STATUS) ?? "all";
+
+  return <ProjectsPageClient initialQ={q} initialStatus={status} />;
 }
