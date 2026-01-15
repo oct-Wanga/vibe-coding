@@ -1,14 +1,11 @@
-import {Button, Card, CardContent, CardHeader, CardTitle} from "@/shared/ui";
-import {AppShell} from "@/widgets/app-shell";
-import {DashboardLayout} from "@/widgets/dashboard-layout";
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@/shared/ui";
+import { AppShell } from "@/widgets/app-shell";
+import { DashboardLayout } from "@/widgets/dashboard-layout";
 
 export function DashboardView() {
   return (
     <AppShell>
-      <DashboardLayout
-        title="Dashboard"
-        actions={<Button variant="outline">Refresh</Button>}
-      >
+      <DashboardLayout title="Dashboard" actions={<Button variant="outline">Refresh</Button>}>
         <Card>
           <CardHeader>
             <CardTitle>Overview</CardTitle>

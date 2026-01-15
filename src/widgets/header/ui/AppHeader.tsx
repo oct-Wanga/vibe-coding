@@ -1,10 +1,9 @@
 import Link from "next/link";
 
-import {UserAvatar} from "@/entities/user";
-import {routes} from "@/shared/config/routes";
+import { UserAvatar } from "@/entities/user";
+import { routes } from "@/shared/config/routes";
 
-const mockUser = {email: "user@example.com", name: "User", imageUrl: null};
-
+const mockUser = { email: "user@example.com", name: "User", imageUrl: null };
 
 export function AppHeader() {
   return (
@@ -18,7 +17,7 @@ export function AppHeader() {
           <Link href={routes.dashboard} className="text-sm text-gray-600 hover:underline">
             Dashboard
           </Link>
-          <UserAvatar user={mockUser}/>
+          <UserAvatar user={mockUser} />
         </div>
       </div>
     </header>

@@ -1,8 +1,7 @@
-import {ReactNode} from "react";
+import type { ReactNode } from "react";
 
-import {SidebarClient} from "./SidebarClient";
+import { SidebarClient } from "./SidebarClient";
 
-
-export function Sidebar({children}: { children?: ReactNode }) {
+export function Sidebar({ children }: { children?: ReactNode }) {
   return <SidebarClient>{children}</SidebarClient>;
 }

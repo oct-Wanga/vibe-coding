@@ -1,12 +1,11 @@
-import {formatProjectLabel, type Project} from "@/entities/project";
-import {Button} from "@/shared/ui";
-import {AppShell} from "@/widgets/app-shell";
-import {DashboardLayout} from "@/widgets/dashboard-layout";
-
+import { formatProjectLabel, type Project } from "@/entities/project";
+import { Button } from "@/shared/ui";
+import { AppShell } from "@/widgets/app-shell";
+import { DashboardLayout } from "@/widgets/dashboard-layout";
 
 const mockProjects: Project[] = [
-  {id: "p1", name: "Alpha", status: "active", ownerId: "u1"},
-  {id: "p2", name: "Beta", status: "archived", ownerId: "u1"},
+  { id: "p1", name: "Alpha", status: "active", ownerId: "u1" },
+  { id: "p2", name: "Beta", status: "archived", ownerId: "u1" },
 ];
 
 export function ProjectListView() {
