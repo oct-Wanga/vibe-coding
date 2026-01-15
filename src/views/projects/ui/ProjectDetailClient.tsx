@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 import { useProject } from "@/entities/project";
-import { AppShell } from "@/widgets/app-shell";
+import { Badge, Card, CardContent, CardHeader } from "@/shared/ui";
 
 export function ProjectDetailClient({ id }: { id: string }) {
   const project = useProject(id);
@@ -13,22 +13,21 @@ export function ProjectDetailClient({ id }: { id: string }) {
   if (!project.data) return <div className="text-sm text-gray-500">No data</div>;
 
   return (
-    <AppShell>
-      <div className="space-y-4">
-        <header className="space-y-1">
-          <Link className="text-sm underline" href="/projects">
-            ← Back
-          </Link>
+    <div className="space-y-4">
+      <Link className="text-sm underline" href="/projects">
+        ← Back
+      </Link>
+
+      <Card>
+        <CardHeader>
           <h1 className="text-xl font-semibold">{project.data.name}</h1>
           <div className="text-sm text-gray-500">ID: {project.data.id}</div>
-        </header>
-
-        <section className="rounded-lg border p-3">
-          <div className="text-sm">
-            Status: <span className="font-medium">{project.data.status}</span>
-          </div>
-        </section>
-      </div>
-    </AppShell>
+        </CardHeader>
+        <CardContent className="flex items-center gap-2">
+          <div className="text-sm">Status</div>
+          <Badge>{project.data.status}</Badge>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -1,7 +1,6 @@
+import { PROJECT_STATUS } from "@/features/projects-filter";
 import { getEnumParam, getStringParam } from "@/shared/lib/searchParams";
 import { ProjectsPageClient } from "@/views/projects";
-
-const STATUS = ["all", "active", "archived"] as const;
 
 export default async function ProjectsPage({
   searchParams,
@@ -11,7 +10,7 @@ export default async function ProjectsPage({
   const sp = await searchParams;
 
   const q = getStringParam(sp, "q") ?? "";
-  const status = getEnumParam(sp, "status", STATUS) ?? "all";
+  const status = getEnumParam(sp, "status", PROJECT_STATUS) ?? "all";
 
   return <ProjectsPageClient initialQ={q} initialStatus={status} />;
 }
