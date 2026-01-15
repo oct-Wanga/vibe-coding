@@ -33,8 +33,7 @@ async function loginRequest(input: LoginInput): Promise<LoginResponse> {
       "Login failed";
 
     // React Query에선 throw로 에러 상태로 보내는 게 표준
-    const err: ApiError = { message, status: res.status, details: text };
-    throw err;
+    throw { message, status: res.status, details: text };
   }
 
   return { ok: true };
