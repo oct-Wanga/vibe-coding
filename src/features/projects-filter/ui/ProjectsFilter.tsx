@@ -3,7 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import type { ProjectStatus } from "@/shared/lib/projectSearchParams";
+import type { ProjectStatusFilter } from "@/shared/lib/projectSearchParams";
 import { PROJECT_STATUS, readProjectsFilters } from "@/shared/lib/projectSearchParams";
 import { setParam } from "@/shared/lib/searchParams";
 import {
@@ -24,7 +24,7 @@ export function ProjectsFilter({
   initialStatus,
 }: {
   initialQ: string;
-  initialStatus: ProjectStatus;
+  initialStatus: ProjectStatusFilter;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -38,7 +38,7 @@ export function ProjectsFilter({
 
   // ✅ 입력 중(draft)은 로컬
   const [draftQ, setDraftQ] = useState(currentQ);
-  const [draftStatus, setDraftStatus] = useState<ProjectStatus>(currentStatus);
+  const [draftStatus, setDraftStatus] = useState<ProjectStatusFilter>(currentStatus);
 
   // URL이 바뀌면 draft도 동기화
   useEffect(() => {
@@ -87,7 +87,10 @@ export function ProjectsFilter({
               <div className="text-xs text-gray-500">Status</div>
 
               {/* ✅ shadcn Select */}
-              <Select value={draftStatus} onValueChange={(v) => setDraftStatus(v as ProjectStatus)}>
+              <Select
+                value={draftStatus}
+                onValueChange={(v) => setDraftStatus(v as ProjectStatusFilter)}
+              >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>

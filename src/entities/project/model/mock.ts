@@ -1,4 +1,4 @@
-import type { Project } from "../api/useProject";
+import type { Project } from "@/entities/project";
 
 export const PROJECTS: Project[] = [
   { id: "p_001", name: "Alpha", status: "active" },

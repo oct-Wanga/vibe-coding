@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import { useProjects } from "@/entities/project";
-import type { ProjectStatus } from "@/shared/lib/projectSearchParams";
+import type { ProjectStatusFilter } from "@/shared/lib/projectSearchParams";
 import { readProjectsFilters } from "@/shared/lib/projectSearchParams";
 import { Badge, Card, CardContent } from "@/shared/ui";
 
@@ -13,7 +13,7 @@ export function ProjectsList({
   initialStatus,
 }: {
   initialQ: string;
-  initialStatus: ProjectStatus;
+  initialStatus: ProjectStatusFilter;
 }) {
   const sp = useSearchParams();
   const { q, status } = readProjectsFilters(sp, { q: initialQ, status: initialStatus });

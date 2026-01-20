@@ -1,7 +1,7 @@
 "use client";
 
 import { ProjectsFilter } from "@/features/projects-filter";
-import type { ProjectStatus } from "@/shared/lib/projectSearchParams";
+import type { ProjectStatusFilter } from "@/shared/lib/projectSearchParams";
 import { ProjectsList } from "@/widgets/projects-list";
 
 export function ProjectsPageClient({
@@ -9,7 +9,7 @@ export function ProjectsPageClient({
   initialStatus,
 }: {
   initialQ: string;
-  initialStatus: ProjectStatus;
+  initialStatus: ProjectStatusFilter;
 }) {
   return (
     <div className="space-y-4">
