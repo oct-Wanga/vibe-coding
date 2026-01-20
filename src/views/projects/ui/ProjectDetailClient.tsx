@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { useProject } from "@/features/projects";
+import { useProject } from "@/entities/project";
 import { Badge, Card, CardContent, CardHeader } from "@/shared/ui";
 
 export function ProjectDetailClient({ id }: { id: string }) {
