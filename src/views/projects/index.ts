@@ -1,2 +1,2 @@
-export * from "./ui/ProjectDetailClient";
-export * from "./ui/ProjectsPageClient";
+export { ProjectDetailClient } from "./ui/ProjectDetailClient";
+export { ProjectsPageClient } from "./ui/ProjectsPageClient";

@@ -2,13 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import type { Project } from "@/entities/project";
+import type { Project, ProjectsParams } from "@/entities/project";
 import { projectKeys } from "@/entities/project";
-
-export type ProjectsParams = {
-  q?: string;
-  status?: "active" | "archived" | "all";
-};
 
 async function fetchProjects(params: ProjectsParams): Promise<Project[]> {
   const sp = new URLSearchParams();
