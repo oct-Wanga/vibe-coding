@@ -13,5 +13,3 @@ export function useProjects(params: ProjectsParams) {
     queryFn: () => fetchProjects(params),
   });
 }
-
-ㅕ;

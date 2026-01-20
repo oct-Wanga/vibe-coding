@@ -52,20 +52,24 @@ npm run test:e2e:ui
 ## 3) Tech Stack
 
 ### Core
+
 - Next.js 16 (App Router)
 - React 19
 - TypeScript
 
 ### UI
+
 - Tailwind CSS
 - shadcn/ui (Radix 기반)
 
 ### Data
+
 - TanStack Query (서버 상태)
 - Zustand (UI 전역 상태 최소화)
 - `fetch` 기반 API 호출
 
 ### Test
+
 - Vitest
 - Playwright
 
@@ -137,11 +141,13 @@ src/
 각 슬라이스(예: `entities/project`)는 **외부에서 접근 가능한 export를 `index.ts`로만 노출**합니다.
 
 ✅ 권장
+
 ```ts
 import { useProjects, projectKeys, type Project } from "@/entities/project";
 ```
 
 ❌ 지양(딥 임포트)
+
 ```ts
 import { useProjects } from "@/entities/project/hooks/useProjects";
 ```
@@ -165,7 +171,11 @@ Next 16에서는 `params` / `searchParams`가 **Promise로 타입이 강제**될
 예시:
 
 ```ts
-export default async function Page({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const sp = await searchParams;
   // ...
 }
@@ -176,14 +186,17 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
 ## 8) 데이터 설계 가이드(이 프로젝트 기준)
 
 ### Entities: 도메인 데이터 접근
+
 - `entities/project/model`: 타입, key, 순수 도메인 로직
 - `entities/project/api`: fetcher
 - `entities/project/hooks`: TanStack Query hooks
 
 ### Features: 유스케이스(행동)
+
 - 예: `features/projects-filter`는 **URL을 싱글 소스로 삼아** 필터를 적용/리셋하는 행동을 담당
 
 ### Widgets/Views: 화면 구성
+
 - `views/projects`는 feature + widget을 조립해 스크린을 구성
 - `widgets/projects-list`는 “리스트 블록” 책임만 가짐
 
@@ -206,6 +219,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
 - `src/shared/ui/index.ts`에서 일괄 export 합니다.
 
 예:
+
 ```ts
 import { Button, Card, Input, Select } from "@/shared/ui";
 ```
@@ -216,4 +230,3 @@ import { Button, Card, Input, Select } from "@/shared/ui";
 
 - 이 레포의 프로젝트 데이터는 `entities/project/model/mock.ts`에 **mock**으로 들어 있습니다.
 - 실제 프로젝트에서는 `entities/*/api`에서 BFF(Route Handlers) 또는 외부 API 서버를 붙이면 됩니다.
-

@@ -2,7 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchProject } from "../api/fetchProject";
+import { fetchProject } from "@/entities/project";
+
 import { projectKeys } from "../model/keys";
 
 export function useProject(id: string) {

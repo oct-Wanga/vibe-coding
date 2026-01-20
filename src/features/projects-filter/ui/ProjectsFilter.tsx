@@ -87,7 +87,10 @@ export function ProjectsFilter({
               <div className="text-xs text-gray-500">Status</div>
 
               {/* ✅ shadcn Select */}
-              <Select value={draftStatus} onValueChange={(v) => setDraftStatus(v as ProjectStatusFilter)}>
+              <Select
+                value={draftStatus}
+                onValueChange={(v) => setDraftStatus(v as ProjectStatusFilter)}
+              >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
