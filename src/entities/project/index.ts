@@ -1,5 +1,5 @@
-export * from "./api/useProject";
-export * from "./api/useProjects";
+export * from "../../features/projects/api/queries/useProject";
+export * from "../../features/projects/api/queries/useProjects";
 export { formatProjectLabel } from "./lib/format";
 export * from "./model/keys";
 export * from "./model/mock";

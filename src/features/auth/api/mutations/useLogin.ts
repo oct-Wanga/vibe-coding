@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import type { LoginInput } from "@/features/auth";
 
-import { authKeys } from "../model/keys";
+import { authKeys } from "../../model/keys";
 
 type LoginResponse = { ok: true } | { ok: false; message: string };
 

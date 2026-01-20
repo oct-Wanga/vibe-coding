@@ -2,8 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { projectKeys } from "../model/keys";
-import type { Project } from "./useProject";
+import type { Project } from "@/entities/project";
+import { projectKeys } from "@/entities/project";
 
 export type ProjectsParams = {
   q?: string;

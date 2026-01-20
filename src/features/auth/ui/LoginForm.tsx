@@ -3,10 +3,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { type LoginInput, loginSchema } from "@/features/auth";
+import { type LoginInput, loginSchema, useLogin } from "@/features/auth";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@/shared/ui";
-
-import { useLogin } from "../api/useLogin";
 
 export function LoginForm() {
   const login = useLogin();

@@ -2,13 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { projectKeys } from "../model/keys";
-
-export type Project = {
-  id: string;
-  name: string;
-  status: "active" | "archived";
-};
+import type { Project } from "@/entities/project";
+import { projectKeys } from "@/entities/project";
 
 async function fetchProject(id: string): Promise<Project> {
   const res = await fetch(`/api/projects/${id}`);
