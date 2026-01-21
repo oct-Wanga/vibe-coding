@@ -12,7 +12,9 @@ async function fetchProjects(params: ProjectsParams): Promise<Project[]> {
   if (params.status && params.status !== "all") sp.set("status", params.status);
 
   const qs = sp.toString();
-  const res = await fetch(`/api/projects${qs ? `?${qs}` : ""}`);
+  const res = await fetch(`/api/projects${qs ? `?${qs}` : ""}`, {
+    credentials: "include",
+  });
 
   if (!res.ok) throw new Error("Failed to fetch projects");
   return (await res.json()) as Project[];

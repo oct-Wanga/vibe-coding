@@ -1,16 +1,52 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
-import { filterProjects } from "@/entities/project";
+import { createSupabaseServerClient } from "@/shared/supabase";
 
-export function GET(req: Request) {
-  const url = new URL(req.url);
-  const q = url.searchParams.get("q") ?? undefined;
-  const status = url.searchParams.get("status") ?? undefined;
+export async function GET(req: NextRequest) {
+  const supabase = await createSupabaseServerClient();
 
-  const list = filterProjects({
-    q,
-    status: status === "active" || status === "archived" ? status : undefined,
+  // 보호: claims 기반 검증 권장 :contentReference[oaicite:11]{index=11}
+  const { data: claims } = await supabase.auth.getClaims();
+  if (!claims) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+
+  const sp = req.nextUrl.searchParams;
+  const q = sp.get("q")?.trim() ?? "";
+  const status = sp.get("status"); // active|archived|null
+
+  let query = supabase
+    .from("projects")
+    .select("id,name,status,created_at,updated_at")
+    .order("created_at", { ascending: false });
+
+  if (q) query = query.ilike("name", `%${q}%`);
+  if (status === "active" || status === "archived") query = query.eq("status", status);
+
+  const { data, error } = await query;
+  if (error) return NextResponse.json({ message: error.message }, { status: 500 });
+
+  return NextResponse.json(data ?? []);
+}
+
+export async function POST(req: NextRequest) {
+  const supabase = await createSupabaseServerClient();
+
+  const { data: claims } = await supabase.auth.getClaims();
+  if (!claims) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+
+  const body = (await req.json().catch(() => null)) as { id?: string; name?: string } | null;
+  if (!body?.id || !body?.name) {
+    return NextResponse.json({ message: "id/name required" }, { status: 400 });
+  }
+
+  // user_id는 RLS 정책(INSERT with check) 때문에 반드시 auth.uid()와 일치해야 함
+  const { error } = await supabase.from("projects").insert({
+    id: body.id,
+    name: body.name,
+    status: "active",
+    user_id: claims.claims.sub, // auth uid
   });
 
-  return NextResponse.json(list);
+  if (error) return NextResponse.json({ message: error.message }, { status: 400 });
+
+  return NextResponse.json({ ok: true }, { status: 201 });
 }

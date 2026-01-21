@@ -1,4 +1,4 @@
-type SearchParamsLike = Record<string, string | string[] | undefined> | URLSearchParams;
+export type SearchParamsLike = Record<string, string | string[] | undefined> | URLSearchParams;
 
 export function getStringParam(sp: SearchParamsLike, key: string): string | undefined {
   if (sp instanceof URLSearchParams) {
