@@ -6,10 +6,6 @@ export * from "./model/mock";
 export type { Project, ProjectId, ProjectsParams, ProjectStatus } from "./model/project";
 export { isArchived } from "./model/project";
 
-// api
-export { fetchProject } from "./api/fetchProject";
-export { fetchProjects } from "./api/fetchProjects";
-
 // hooks
-export { useProject } from "./hooks/useProject";
-export { useProjects } from "./hooks/useProjects";
+export { useProject } from "./api/queries/useProject";
+export { useProjects } from "./api/queries/useProjects";
