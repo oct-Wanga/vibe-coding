@@ -1,5 +1,10 @@
 export type UserId = string;
 
+export type SignupBody = {
+  email: string;
+  password: string;
+};
+
 export type User = {
   id: UserId;
   email: string;
