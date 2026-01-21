@@ -1,11 +1,9 @@
 // @flow
 import * as React from "react";
 
-import { LoginForm } from "@/features/auth";
-
 import { MarketingLinkBox } from "./MarketingLinkBox";
 
-export const MarketingPage = () => {
+export const MarketingPage = ({ children }: { children: React.ReactNode }) => {
   return (
     <main className="mx-auto max-w-3xl space-y-6 p-6">
       <header className="space-y-2">
@@ -19,10 +17,7 @@ export const MarketingPage = () => {
 
       <MarketingLinkBox />
 
-      <section className="rounded-lg border p-4">
-        <h2 className="mb-3 text-lg font-semibold">Login (feature 예시)</h2>
-        <LoginForm />
-      </section>
+      <section className="rounded-lg p-4 ">{children}</section>
     </main>
   );
 };
