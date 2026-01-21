@@ -1,12 +1,21 @@
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: Request) {
-  const body = await req.json().catch(() => null);
+import { createSupabaseServerClient } from "@/shared/supabase";
 
-  // Demo: 아주 단순한 체크만 (실서비스에서는 Better Auth / 쿠키 세션 / OAuth 등으로 교체)
+export async function POST(req: NextRequest) {
+  const supabase = await createSupabaseServerClient();
+  const body = (await req.json().catch(() => null)) as { email?: string; password?: string } | null;
+
   if (!body?.email || !body?.password) {
-    return NextResponse.json({ ok: false, message: "Missing credentials" }, { status: 400 });
+    return NextResponse.json({ message: "email/password required" }, { status: 400 });
   }
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: body.email,
+    password: body.password,
+  });
+
+  if (error) return NextResponse.json({ message: error.message }, { status: 401 });
 
   return NextResponse.json({ ok: true });
 }
