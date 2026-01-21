@@ -1,8 +1,17 @@
 import { createBrowserClient } from "@supabase/ssr";
 
+function getPublicKey() {
+  return (
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
+    ""
+  );
+}
+
 export function createSupabaseBrowserClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const key = getPublicKey();
+  if (!url || !key) throw new Error("Missing Supabase env vars");
 
-  return createBrowserClient(url, anon);
+  return createBrowserClient(url, key);
 }
