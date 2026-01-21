@@ -35,14 +35,17 @@ export function HomeAuthClient({ initialMode }: { initialMode: Mode }) {
   };
 
   return (
-    <div className="mx-auto max-w-md p-6">
+    <div className="mx-auto max-w-md p-6" data-testid={"auth-shell"}>
       <Card>
         <CardHeader className="space-y-3">
-          <CardTitle>{mode === "login" ? "Sign in" : "Create account"}</CardTitle>
+          <CardTitle>
+            <span data-testid={"auth-mode"}>{mode === "login" ? "Sign in" : "Create account"}</span>
+          </CardTitle>
 
           <div className="flex gap-2">
             <Button
               type="button"
+              data-testid={"auth-tab-login"}
               variant={mode === "login" ? "default" : "secondary"}
               onClick={() => go("login")}
             >
@@ -50,6 +53,7 @@ export function HomeAuthClient({ initialMode }: { initialMode: Mode }) {
             </Button>
             <Button
               type="button"
+              data-testid={"auth-tab-signup"}
               variant={mode === "signup" ? "default" : "secondary"}
               onClick={() => go("signup")}
             >
