@@ -25,6 +25,6 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     ok: true,
     userId: data.user?.id ?? null,
-    needsEmailConfirm: data.session == null,
+    needsEmailConfirm: data.session === null,
   });
 }
