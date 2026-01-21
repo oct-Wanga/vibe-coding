@@ -1,15 +1,16 @@
-export type ProjectId = string;
 export type ProjectStatus = "active" | "archived";
 
 export type Project = {
-  id: ProjectId;
+  id: string;
   name: string;
   status: ProjectStatus;
+  created_at: string;
+  updated_at: string;
 };
 
 export type ProjectsParams = {
   q?: string;
-  status?: "active" | "archived" | "all";
+  status?: ProjectStatus | "all";
 };
 
 export function isArchived(project: Pick<Project, "status">) {
