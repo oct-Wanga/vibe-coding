@@ -9,6 +9,13 @@ function getPublicKey() {
   );
 }
 
+export function hasSupabaseEnv() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = getPublicKey();
+
+  return Boolean(url && key);
+}
+
 export async function createSupabaseServerClient() {
   const cookieStore = await cookies();
 
