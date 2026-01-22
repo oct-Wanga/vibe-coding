@@ -1,9 +1,17 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-import { createSupabaseServerClient } from "@/shared/supabase";
+import { findProject } from "@/entities/project";
+import { createSupabaseServerClient, hasSupabaseEnv } from "@/shared/supabase";
 
 export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
+
+  if (!hasSupabaseEnv()) {
+    const project = findProject(id);
+    if (!project) return NextResponse.json({ message: "Not found" }, { status: 404 });
+
+    return NextResponse.json(project);
+  }
 
   const supabase = await createSupabaseServerClient();
   const { data: claims } = await supabase.auth.getClaims();
@@ -23,6 +31,21 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
 
 export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
+
+  if (!hasSupabaseEnv()) {
+    const body = (await req.json().catch(() => null)) as {
+      name?: string;
+      status?: "active" | "archived";
+    } | null;
+    if (!body?.name && !body?.status) {
+      return NextResponse.json({ message: "nothing to update" }, { status: 400 });
+    }
+
+    const project = findProject(id);
+    if (!project) return NextResponse.json({ message: "Not found" }, { status: 404 });
+
+    return NextResponse.json({ ok: true });
+  }
 
   const supabase = await createSupabaseServerClient();
   const { data: claims } = await supabase.auth.getClaims();
@@ -51,6 +74,13 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
 
 export async function DELETE(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
+
+  if (!hasSupabaseEnv()) {
+    const project = findProject(id);
+    if (!project) return NextResponse.json({ message: "Not found" }, { status: 404 });
+
+    return NextResponse.json({ ok: true });
+  }
 
   const supabase = await createSupabaseServerClient();
   const { data: claims } = await supabase.auth.getClaims();
