@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import type { Project, ProjectsParams } from "@/entities/project";
-import { projectKeys } from "@/entities/project";
+import { matchesProjectsParams, projectKeys } from "@/entities/project";
 
 type UpdateProjectInput = { id: string; name: string };
 type ProjectListCache = [readonly unknown[], Project[] | undefined];
@@ -17,18 +17,6 @@ async function updateProject(input: UpdateProjectInput) {
   });
 
   if (!res.ok) throw new Error("Failed to update project");
-}
-
-function matchesListFilter(project: Project, params: ProjectsParams) {
-  if (params.status && params.status !== "all" && project.status !== params.status) {
-    return false;
-  }
-
-  if (params.q && !project.name.toLowerCase().includes(params.q.toLowerCase())) {
-    return false;
-  }
-
-  return true;
 }
 
 export function useUpdateProject() {
@@ -52,7 +40,7 @@ export function useUpdateProject() {
         const params = key[key.length - 1] as ProjectsParams;
         const next = data
           .map((project) => (project.id === id ? { ...project, name } : project))
-          .filter((project) => matchesListFilter(project, params));
+          .filter((project) => matchesProjectsParams(project, params));
 
         qc.setQueryData<Project[]>(key, next);
       });

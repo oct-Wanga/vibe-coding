@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import type { Project, ProjectsParams } from "@/entities/project";
-import { projectKeys } from "@/entities/project";
+import { matchesProjectsParams, projectKeys } from "@/entities/project";
 
 type CreateProjectInput = { id: string; name: string };
 type ProjectListCache = [readonly unknown[], Project[] | undefined];
@@ -17,18 +17,6 @@ async function createProject(input: CreateProjectInput) {
   });
 
   if (!res.ok) throw new Error("Failed to create project");
-}
-
-function matchesListFilter(project: Project, params: ProjectsParams) {
-  if (params.status && params.status !== "all" && project.status !== params.status) {
-    return false;
-  }
-
-  if (params.q && !project.name.toLowerCase().includes(params.q.toLowerCase())) {
-    return false;
-  }
-
-  return true;
 }
 
 export function useCreateProject() {
@@ -53,7 +41,7 @@ export function useCreateProject() {
       listQueries.forEach(([key, data]) => {
         if (!data) return;
         const params = key[key.length - 1] as ProjectsParams;
-        if (!matchesListFilter(nextProject, params)) return;
+        if (!matchesProjectsParams(nextProject, params)) return;
 
         if (data.some((project) => project.id === nextProject.id)) return;
 

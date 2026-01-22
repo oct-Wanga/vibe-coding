@@ -1,3 +1,4 @@
+export { matchesProjectsParams } from "./lib/filter";
 export { formatProjectLabel } from "./lib/format";
 
 // model
