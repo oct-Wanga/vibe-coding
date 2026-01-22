@@ -1,8 +1,22 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-import { createSupabaseServerClient } from "@/shared/supabase";
+import { filterProjects } from "@/entities/project";
+import { createSupabaseServerClient, hasSupabaseEnv } from "@/shared/supabase";
 
 export async function GET(req: NextRequest) {
+  if (!hasSupabaseEnv()) {
+    const sp = req.nextUrl.searchParams;
+    const q = sp.get("q")?.trim() ?? "";
+    const status = sp.get("status");
+
+    return NextResponse.json(
+      filterProjects({
+        q,
+        status: status === "active" || status === "archived" ? status : undefined,
+      }),
+    );
+  }
+
   const supabase = await createSupabaseServerClient();
 
   // 보호: claims 기반 검증 권장 :contentReference[oaicite:11]{index=11}
@@ -28,6 +42,15 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!hasSupabaseEnv()) {
+    const body = (await req.json().catch(() => null)) as { id?: string; name?: string } | null;
+    if (!body?.id || !body?.name) {
+      return NextResponse.json({ message: "id/name required" }, { status: 400 });
+    }
+
+    return NextResponse.json({ ok: true }, { status: 201 });
+  }
+
   const supabase = await createSupabaseServerClient();
 
   const { data: claims } = await supabase.auth.getClaims();

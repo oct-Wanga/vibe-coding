@@ -1,3 +1,3 @@
 export { createSupabaseBrowserClient } from "./client";
 export { updateSession } from "./proxy";
-export { createSupabaseServerClient } from "./server";
+export { createSupabaseServerClient, hasSupabaseEnv } from "./server";
