@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getStringParam, setParam } from "./searchParams";
+import { getEnumParam, getNumberParam, getStringParam, setParam } from "./searchParams";
 
 describe("searchParams utils", () => {
   it("getStringParam works with URLSearchParams", () => {
@@ -34,5 +34,28 @@ describe("searchParams utils", () => {
 
     setParam(next, "auth", "");
     expect(next.get("auth")).toBeNull();
+  });
+
+  it("getEnumParam returns allowed value only", () => {
+    const allowed = ["all", "active", "archived"] as const;
+
+    expect(getEnumParam(new URLSearchParams("status=active"), "status", allowed)).toBe("active");
+    expect(getEnumParam(new URLSearchParams("status=invalid"), "status", allowed)).toBeUndefined();
+    expect(getEnumParam(new URLSearchParams(), "status", allowed)).toBeUndefined();
+  });
+
+  it("getNumberParam parses finite numbers only", () => {
+    const sp = new URLSearchParams("page=2&bad=NaN&inf=Infinity");
+    expect(getNumberParam(sp, "page")).toBe(2);
+    expect(getNumberParam(sp, "bad")).toBeUndefined();
+    expect(getNumberParam(sp, "inf")).toBeUndefined();
+    expect(getNumberParam(sp, "missing")).toBeUndefined();
+  });
+
+  it("getNumberParam applies min/max constraints", () => {
+    const sp = new URLSearchParams("n=5");
+    expect(getNumberParam(sp, "n", { min: 1, max: 10 })).toBe(5);
+    expect(getNumberParam(sp, "n", { min: 6 })).toBeUndefined();
+    expect(getNumberParam(sp, "n", { max: 4 })).toBeUndefined();
   });
 });
