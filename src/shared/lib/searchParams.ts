@@ -23,10 +23,10 @@ export function getNumberParam(
   if (!Number.isFinite(n)) return undefined;
 
   const min = options?.min;
-  if (min !== null && n < (min as number)) return undefined;
+  if (min !== undefined && n < min) return undefined;
 
   const max = options?.max;
-  if (max !== null && n > (max as number)) return undefined;
+  if (max !== undefined && n > max) return undefined;
 
   return n;
 }

@@ -91,7 +91,7 @@ export function ProjectsFilter({
                 value={draftStatus}
                 onValueChange={(v) => setDraftStatus(v as ProjectStatusFilter)}
               >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px]" data-testid="project-status">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent className="w-[180px] mt-1">
