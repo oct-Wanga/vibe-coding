@@ -15,6 +15,8 @@ test.describe("Projects CRUD (/projects)", () => {
     await page.getByPlaceholder("자동 생성됨").fill(uniqueId);
     await page.getByRole("button", { name: "생성" }).click();
 
+    await page.getByRole("button", { name: "Apply" }).click();
+
     const listItem = page.locator("li", { hasText: projectName });
     await expect(listItem).toBeVisible();
 
