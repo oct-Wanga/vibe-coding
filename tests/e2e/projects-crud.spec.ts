@@ -36,4 +36,24 @@ test.describe("Projects CRUD (/projects)", () => {
     await expect(page).toHaveURL("/projects");
     await expect(page.locator("li", { hasText: updatedName })).toHaveCount(0);
   });
+
+  test("create project shows in list without auth", async ({ page }) => {
+    const uniqueId = `p_e2e_list_${Date.now()}`;
+    const projectName = `E2E List ${uniqueId}`;
+
+    await page.goto("/projects");
+
+    await page.getByPlaceholder("프로젝트 이름").fill(projectName);
+    await page.getByPlaceholder("자동 생성됨").fill(uniqueId);
+    await page.getByRole("button", { name: "생성" }).click();
+
+    const listItem = page.locator("li", { hasText: projectName });
+    await expect(listItem).toBeVisible();
+
+    await listItem.getByRole("link", { name: "Open" }).click();
+    await page.getByRole("button", { name: "삭제" }).click();
+    await page.getByRole("button", { name: "정말 삭제" }).click();
+
+    await expect(page).toHaveURL("/projects");
+  });
 });
