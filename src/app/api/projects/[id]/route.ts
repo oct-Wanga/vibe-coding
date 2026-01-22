@@ -1,13 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-import { findProject } from "@/entities/project";
+import { deleteMockProject, findMockProject, updateMockProject } from "@/entities/project";
 import { createSupabaseServerClient, hasSupabaseEnv } from "@/shared/supabase";
 
 export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
 
   if (!hasSupabaseEnv()) {
-    const project = findProject(id);
+    const project = findMockProject(id);
     if (!project) return NextResponse.json({ message: "Not found" }, { status: 404 });
 
     return NextResponse.json(project);
@@ -41,8 +41,11 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
       return NextResponse.json({ message: "nothing to update" }, { status: 400 });
     }
 
-    const project = findProject(id);
-    if (!project) return NextResponse.json({ message: "Not found" }, { status: 404 });
+    const updated = updateMockProject(id, {
+      ...(body.name ? { name: body.name } : {}),
+      ...(body.status ? { status: body.status } : {}),
+    });
+    if (!updated) return NextResponse.json({ message: "Not found" }, { status: 404 });
 
     return NextResponse.json({ ok: true });
   }
@@ -76,8 +79,8 @@ export async function DELETE(_req: NextRequest, context: { params: Promise<{ id:
   const { id } = await context.params;
 
   if (!hasSupabaseEnv()) {
-    const project = findProject(id);
-    if (!project) return NextResponse.json({ message: "Not found" }, { status: 404 });
+    const deleted = deleteMockProject(id);
+    if (!deleted) return NextResponse.json({ message: "Not found" }, { status: 404 });
 
     return NextResponse.json({ ok: true });
   }

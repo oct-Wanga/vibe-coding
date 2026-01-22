@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-import { filterProjects } from "@/entities/project";
+import { createMockProject, getMockProjects } from "@/entities/project";
 import { createSupabaseServerClient, hasSupabaseEnv } from "@/shared/supabase";
 
 export async function GET(req: NextRequest) {
@@ -9,12 +9,15 @@ export async function GET(req: NextRequest) {
     const q = sp.get("q")?.trim() ?? "";
     const status = sp.get("status");
 
-    return NextResponse.json(
-      filterProjects({
-        q,
-        status: status === "active" || status === "archived" ? status : undefined,
-      }),
-    );
+    const mockProjects = getMockProjects();
+    const normalizedStatus = status === "active" || status === "archived" ? status : undefined;
+    const filtered = mockProjects.filter((project) => {
+      const matchesQ = q.length === 0 ? true : project.name.toLowerCase().includes(q.toLowerCase());
+      const matchesStatus = normalizedStatus ? project.status === normalizedStatus : true;
+      return matchesQ && matchesStatus;
+    });
+
+    return NextResponse.json(filtered);
   }
 
   const supabase = await createSupabaseServerClient();
@@ -48,7 +51,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "id/name required" }, { status: 400 });
     }
 
-    return NextResponse.json({ ok: true }, { status: 201 });
+    const project = createMockProject({ id: body.id, name: body.name });
+    return NextResponse.json(project, { status: 201 });
   }
 
   const supabase = await createSupabaseServerClient();
