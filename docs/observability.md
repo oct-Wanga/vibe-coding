@@ -112,7 +112,49 @@ DSN 확인 위치:
 
 1. 로컬에서 개발 서버를 실행합니다.
 2. 브라우저 콘솔 또는 서버 코드에서 아래 예시 중 하나로 이벤트를 전송합니다.
-   - 클라이언트: `Sentry.captureMessage("client test")`
-   - 서버: `Sentry.captureException(new Error("server test"))`
+
+- 클라이언트: `Sentry.captureMessage("client test")`
+- 서버: `Sentry.captureException(new Error("server test"))`
+
 3. Sentry 대시보드에서 프로젝트 → Issues 또는 Discover에서 이벤트가 들어왔는지 확인합니다.
 4. Replay를 켰다면 Project → Replays에서 세션이 기록되는지 확인합니다.
+
+# Sentry 홈페이지 보는 법
+
+## ✅ 설정/연결 상태 확인
+
+이벤트가 제대로 들어오는지 확인이 최우선입니다.
+
+DSN이 올바르게 설정되어 있어야 서버/클라이언트 이벤트가 들어옵니다.
+
+이 레포에서는 클라이언트/서버 모두 수집하려면 SENTRY_DSN과 NEXT_PUBLIC_SENTRY_DSN을 둘 다 설정하도록 되어 있습니다.
+
+## ✅ Issues 탭
+
+Sentry에서 가장 기본적인 에러 집계 화면입니다.
+
+동일한 에러가 그룹핑되어 들어오는지 확인
+
+발생 횟수, 최근 발생 시간, 영향을 받는 사용자 수 등을 확인
+
+이 프로젝트에서는 Sentry.captureException / captureMessage 호출을 통해 직접 에러를 보내는 흐름을 안내합니다.
+
+## ✅ Discover 탭
+
+특정 조건(라우트, 태그, 사용자 등)으로 이벤트를 찾는 데 필수입니다.
+
+예: 특정 API 오류만 보고 싶다면 태그/필드 기준 필터링
+
+README에서도 Issues/Discover에서 이벤트 유입 확인을 안내합니다.
+
+## ✅ Replay 탭
+
+클라이언트 세션 리플레이가 켜져 있으면 오류 시점의 사용자 행동/화면을 재현할 수 있습니다.
+
+이 프로젝트도 Replay 확인 위치를 안내하고 있습니다.
+
+## ✅ 실제 동작 확인 가이드
+
+개발 서버에서 의도적으로 오류를 발생시키고
+
+Issues/Discover/Replay에서 이벤트 유입을 확인하는 흐름이 권장됩니다.
