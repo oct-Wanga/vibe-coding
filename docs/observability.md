@@ -65,6 +65,8 @@ src/shared/lib/monitoring/
 
 실제 운영 환경 기준으로 `@sentry/nextjs` 패키지와 공식 설정 파일을 사용합니다.
 
+- 패키지 버전: `@sentry/nextjs` 10.x (현재 10.36.0)
+
 설치:
 
 ```
@@ -91,3 +93,11 @@ SENTRY_ENVIRONMENT=development
 - `sentry.client.config.ts`
 - `sentry.server.config.ts`
 - `sentry.edge.config.ts`
+
+실제 사용:
+
+1. 환경 변수로 DSN 및 샘플링 비율을 설정합니다.
+2. 서버/엣지 런타임은 `src/instrumentation.ts`에서 런타임을 판별해 `sentry.server.config.ts` 또는 `sentry.edge.config.ts`를 로딩합니다.
+3. 브라우저는 `src/instrumentation-client.ts`에서 초기화되며 Replay 및 라우팅 전환 계측이 활성화됩니다.
+4. 직접 에러를 보내야 할 때는 `Sentry.captureException`, 메시지 기록은 `Sentry.captureMessage`를 사용합니다.
+5. 설정 여부는 `/api/observability/sentry` 엔드포인트로 확인할 수 있습니다.
