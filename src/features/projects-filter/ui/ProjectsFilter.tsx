@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { ProjectStatusFilter } from "@/shared/lib/projectSearchParams";
 import { PROJECT_STATUS, readProjectsFilters } from "@/shared/lib/projectSearchParams";
@@ -36,18 +36,33 @@ export function ProjectsFilter({
     status: initialStatus,
   });
 
-  // ✅ 입력 중(draft)은 로컬
+  return (
+    <ProjectsFilterForm
+      key={`${currentQ}-${currentStatus}`}
+      currentQ={currentQ}
+      currentStatus={currentStatus}
+      pathname={pathname}
+      router={router}
+      sp={sp}
+    />
+  );
+}
+
+function ProjectsFilterForm({
+  currentQ,
+  currentStatus,
+  pathname,
+  router,
+  sp,
+}: {
+  currentQ: string;
+  currentStatus: ProjectStatusFilter;
+  pathname: string;
+  router: ReturnType<typeof useRouter>;
+  sp: ReturnType<typeof useSearchParams>;
+}) {
   const [draftQ, setDraftQ] = useState(currentQ);
   const [draftStatus, setDraftStatus] = useState<ProjectStatusFilter>(currentStatus);
-
-  // URL이 바뀌면 draft도 동기화
-  useEffect(() => {
-    setDraftQ(currentQ);
-  }, [currentQ]);
-
-  useEffect(() => {
-    setDraftStatus(currentStatus);
-  }, [currentStatus]);
 
   const applyToUrl = () => {
     const next = new URLSearchParams(sp.toString());
@@ -69,7 +84,6 @@ export function ProjectsFilter({
         <CardHeader>
           <h1 className="text-xl font-semibold">Projects</h1>
         </CardHeader>
-
         <CardContent>
           <div className="flex flex-wrap items-end gap-2">
             <div className="space-y-1">
@@ -82,11 +96,8 @@ export function ProjectsFilter({
                 />
               </div>
             </div>
-
             <div className="space-y-1">
               <div className="text-xs text-gray-500">Status</div>
-
-              {/* ✅ shadcn Select */}
               <Select
                 value={draftStatus}
                 onValueChange={(v) => setDraftStatus(v as ProjectStatusFilter)}
@@ -103,7 +114,6 @@ export function ProjectsFilter({
                 </SelectContent>
               </Select>
             </div>
-
             <Button type="button" onClick={applyToUrl}>
               Apply
             </Button>

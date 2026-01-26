@@ -1,5 +1,5 @@
-import type { Project } from "./project";
 import { PROJECTS } from "./mock";
+import type { Project } from "./project";
 
 let mockProjects = [...PROJECTS];
 
@@ -26,10 +26,7 @@ export function createMockProject(input: { id: string; name: string }) {
   return project;
 }
 
-export function updateMockProject(
-  id: string,
-  patch: Partial<Pick<Project, "name" | "status">>,
-) {
+export function updateMockProject(id: string, patch: Partial<Pick<Project, "name" | "status">>) {
   const project = findMockProject(id);
   if (!project) return undefined;
 

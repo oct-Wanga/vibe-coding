@@ -6,13 +6,7 @@ import { Button, Input } from "@/shared/ui";
 
 import { useUpdateProject } from "../api/useUpdateProject";
 
-export function ProjectUpdateForm({
-  id,
-  initialName,
-}: {
-  id: string;
-  initialName: string;
-}) {
+export function ProjectUpdateForm({ id, initialName }: { id: string; initialName: string }) {
   const mutation = useUpdateProject();
   const [name, setName] = useState(initialName);
 
@@ -40,9 +34,7 @@ export function ProjectUpdateForm({
         >
           변경
         </Button>
-        {mutation.isError ? (
-          <div className="text-xs text-red-600">변경 실패</div>
-        ) : null}
+        {mutation.isError ? <div className="text-xs text-red-600">변경 실패</div> : null}
         {mutation.isSuccess ? <div className="text-xs text-green-600">변경 완료</div> : null}
       </div>
     </div>

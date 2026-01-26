@@ -1,7 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { deleteMockProject, findMockProject, updateMockProject } from "@/entities/project";
-import { createSupabaseServerClient, hasSupabaseEnv, shouldUseMockProjects } from "@/shared/supabase";
+import {
+  createSupabaseServerClient,
+  hasSupabaseEnv,
+  shouldUseMockProjects,
+} from "@/shared/supabase";
 
 export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
