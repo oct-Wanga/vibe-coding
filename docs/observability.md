@@ -84,9 +84,15 @@ SENTRY_TRACES_SAMPLE_RATE=0.1
 SENTRY_ENVIRONMENT=development
 ```
 
+클라이언트/서버 모두 수집하려면 `SENTRY_DSN`과 `NEXT_PUBLIC_SENTRY_DSN`을 **둘 다** 설정합니다(보통 동일 DSN 사용).
+
 설정 여부 확인:
 
 - `GET /api/observability/sentry`
+
+DSN 확인 위치:
+
+- Sentry 대시보드 → Project Settings → Client Keys (DSN)에서 확인합니다.
 
 설정 파일:
 
