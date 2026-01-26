@@ -55,6 +55,24 @@ src/shared/lib/monitoring/
 
 ## 후속 확장 제안
 
-- Error Tracking (Sentry/Datadog)
+- Error Tracking (Sentry)
 - APM/Tracing (OpenTelemetry)
 - Metrics Export (Prometheus)
+
+---
+
+## Sentry (무료 플랜 사용 가능)
+
+브라우저 오류 추적을 위해 Sentry Browser SDK를 CDN으로 로드합니다.
+
+필요 환경 변수:
+
+```
+NEXT_PUBLIC_SENTRY_DSN=
+NEXT_PUBLIC_SENTRY_ENVIRONMENT=development
+NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE=0.1
+```
+
+설정 여부 확인:
+
+- `GET /api/observability/sentry`

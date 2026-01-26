@@ -91,6 +91,20 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY= # 또는 NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 자세한 설계는 `docs/observability.md`를 참고하세요.
 
+### Sentry (무료 플랜)
+
+브라우저 오류 추적을 위해 Sentry Browser SDK를 CDN으로 로드합니다.
+
+```
+NEXT_PUBLIC_SENTRY_DSN=
+NEXT_PUBLIC_SENTRY_ENVIRONMENT=development
+NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE=0.1
+```
+
+설정 여부 확인:
+
+- `GET /api/observability/sentry`
+
 ---
 
 ## 3) Tech Stack
