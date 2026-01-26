@@ -5,8 +5,10 @@ test.describe("Health check (/api/health)", () => {
     const response = await request.get("/api/health");
 
     expect(response.ok()).toBeTruthy();
+    expect(response.headers()["x-request-id"]).toBeTruthy();
 
     const data = await response.json();
+    expect(data.requestId).toBe(response.headers()["x-request-id"]);
 
     expect(data).toMatchObject({
       status: "ok",

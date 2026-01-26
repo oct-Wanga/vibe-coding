@@ -2,13 +2,19 @@ export type HealthPayload = {
   status: "ok";
   timestamp: string;
   environment: string;
+  requestId?: string;
 };
 
-export function createHealthPayload(now: Date, environment: string): HealthPayload {
+export function createHealthPayload(
+  now: Date,
+  environment: string,
+  requestId?: string,
+): HealthPayload {
   return {
     status: "ok",
     timestamp: now.toISOString(),
     environment,
+    ...(requestId ? { requestId } : {}),
   };
 }
 
