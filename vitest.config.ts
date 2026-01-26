@@ -6,6 +6,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@sentry/nextjs": path.resolve(__dirname, "./tests/mocks/sentry-nextjs.ts"),
     },
   },
   test: {
