@@ -21,6 +21,17 @@ npm run dev
 
 ---
 
+## 1-1) Docker 실행
+
+```bash
+# 이미지 빌드 + 컨테이너 실행
+docker compose up --build
+```
+
+- http://localhost:3000
+
+---
+
 ## 2) Scripts
 
 ```bash
