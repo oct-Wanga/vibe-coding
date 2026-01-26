@@ -83,9 +83,13 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY= # 또는 NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 - `GET /api/health`
 
+요청에는 `x-request-id`가 자동으로 부여되며 헬스 응답에도 포함됩니다.
+
 ### 구조화 로그 유틸
 
 `src/shared/lib/monitoring/logger.ts`의 유틸을 사용해 기본 JSON 로그를 남길 수 있습니다.
+
+자세한 설계는 `docs/observability.md`를 참고하세요.
 
 ---
 
