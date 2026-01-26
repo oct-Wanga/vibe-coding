@@ -100,6 +100,8 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY= # 또는 NEXT_PUBLIC_SUPABASE_ANON_KEY
 npm install @sentry/nextjs
 ```
 
+현재 패키지 버전: `@sentry/nextjs` 10.x (10.36.0)
+
 ```
 SENTRY_DSN=
 NEXT_PUBLIC_SENTRY_DSN=
@@ -118,6 +120,12 @@ SENTRY_ENVIRONMENT=development
 - `sentry.client.config.ts`
 - `sentry.server.config.ts`
 - `sentry.edge.config.ts`
+
+실제 사용 요약:
+
+- `src/instrumentation.ts`에서 런타임별 Sentry 설정을 로딩합니다.
+- `src/instrumentation-client.ts`에서 브라우저 계측(Replay 포함)을 초기화합니다.
+- 직접 에러를 보낼 때는 `Sentry.captureException` 또는 `Sentry.captureMessage`를 사용합니다.
 
 ---
 
