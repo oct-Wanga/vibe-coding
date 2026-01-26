@@ -1,5 +1,23 @@
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
+import {
+  createHealthPayload,
+  ensureRequestId,
+  getRequestId,
+  getRuntimeEnvironment,
+  REQUEST_ID_HEADER,
+} from "@/shared/lib/monitoring";
+
 export async function GET() {
-  return NextResponse.json({ ok: true, ts: Date.now() });
+  const requestHeaders = await headers();
+  const requestId = ensureRequestId(getRequestId(requestHeaders) ?? null, () =>
+    crypto.randomUUID(),
+  );
+  const payload = createHealthPayload(new Date(), getRuntimeEnvironment(), requestId);
+
+  const response = NextResponse.json(payload);
+  response.headers.set(REQUEST_ID_HEADER, requestId);
+
+  return response;
 }

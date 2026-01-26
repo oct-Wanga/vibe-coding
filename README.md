@@ -70,8 +70,68 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY= # 또는 NEXT_PUBLIC_SUPABASE_ANON_KEY
 ```
 
 환경 변수가 없으면 `/api/projects` 관련 엔드포인트는 **mock 데이터**를 사용합니다.
+
 - mock 데이터는 `entities/project/model/mock.ts` 기준
 - `POST/PATCH/DELETE`는 성공 응답만 반환하고 **영구 저장은 하지 않습니다**
+
+---
+
+## 2-2) 관측/모니터링
+
+### Health Check
+
+간단한 헬스 체크 엔드포인트를 제공합니다.
+
+- `GET /api/health`
+
+요청에는 `x-request-id`가 자동으로 부여되며 헬스 응답에도 포함됩니다(프록시 경로는 `proxy.ts` 기준).
+
+### 구조화 로그 유틸
+
+`src/shared/lib/monitoring/logger.ts`의 유틸을 사용해 기본 JSON 로그를 남길 수 있습니다.
+
+자세한 설계는 `docs/observability.md`를 참고하세요.
+
+### Sentry (무료 플랜)
+
+실제 운영 환경 기준으로 `@sentry/nextjs` 패키지와 공식 설정 파일을 사용합니다.
+
+```
+npm install @sentry/nextjs
+```
+
+현재 패키지 버전: `@sentry/nextjs` 10.x (10.36.0)
+
+```
+SENTRY_DSN=
+NEXT_PUBLIC_SENTRY_DSN=
+NEXT_PUBLIC_SENTRY_ENVIRONMENT=development
+NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE=0.1
+SENTRY_TRACES_SAMPLE_RATE=0.1
+SENTRY_ENVIRONMENT=development
+```
+
+설정 여부 확인:
+
+- `GET /api/observability/sentry`
+
+설정 파일:
+
+- `sentry.client.config.ts`
+- `sentry.server.config.ts`
+- `sentry.edge.config.ts`
+
+실제 사용 요약:
+
+- `src/instrumentation.ts`에서 런타임별 Sentry 설정을 로딩합니다.
+- `src/instrumentation-client.ts`에서 브라우저 계측(Replay 포함)을 초기화합니다.
+- 직접 에러를 보낼 때는 `Sentry.captureException` 또는 `Sentry.captureMessage`를 사용합니다.
+
+이벤트/로그 확인:
+
+1. 개발 서버 실행 후, 클라이언트/서버에서 `Sentry.captureMessage` 또는 `Sentry.captureException`을 호출합니다.
+2. Sentry 대시보드의 Issues/Discover에서 이벤트 유입을 확인합니다.
+3. Replay 사용 시 Project → Replays에서 세션 기록을 확인합니다.
 
 ---
 
