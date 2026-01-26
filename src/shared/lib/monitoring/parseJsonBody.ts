@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 
-import { type ApiErrorContext, captureApiError } from "./captureApiError";
+import { captureApiError, type ApiErrorContext } from "./captureApiError";
 
 type ParseResult<T> = { ok: true; body: T } | { ok: false; errorId: string };
 
@@ -13,6 +13,9 @@ export async function parseJsonBody<T>(
 ): Promise<ParseResult<T>> {
   try {
     const body = (await req.json()) as T;
+    if (body === null) {
+      throw new Error("Empty JSON body");
+    }
     return { ok: true, body };
   } catch (error) {
     const errorId = captureApiError(error, {
