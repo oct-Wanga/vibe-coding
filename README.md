@@ -83,7 +83,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY= # 또는 NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 - `GET /api/health`
 
-요청에는 `x-request-id`가 자동으로 부여되며 헬스 응답에도 포함됩니다.
+요청에는 `x-request-id`가 자동으로 부여되며 헬스 응답에도 포함됩니다(프록시 경로는 `proxy.ts` 기준).
 
 ### 구조화 로그 유틸
 
