@@ -1,16 +1,19 @@
 import { describe, expect, it } from "vitest";
 
-import { buildSentryBrowserSnippet } from "./sentryBrowser";
+import { buildSentryBrowserConfig } from "./sentryBrowser";
 
-describe("buildSentryBrowserSnippet", () => {
-  it("creates a snippet with normalized sample rate", () => {
-    const snippet = buildSentryBrowserSnippet({
+describe("buildSentryBrowserConfig", () => {
+  it("normalizes sample rate to the 0~1 range", () => {
+    const config = buildSentryBrowserConfig({
       dsn: "https://example@sentry.io/123",
       environment: "test",
       tracesSampleRate: 1.5,
     });
 
-    expect(snippet).toContain("window.Sentry.init");
-    expect(snippet).toContain("\"tracesSampleRate\":1");
+    expect(config).toEqual({
+      dsn: "https://example@sentry.io/123",
+      environment: "test",
+      tracesSampleRate: 1,
+    });
   });
 });

@@ -93,7 +93,11 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY= # 또는 NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 ### Sentry (무료 플랜)
 
-브라우저 오류 추적을 위해 Sentry Browser SDK를 CDN으로 로드합니다.
+브라우저 오류 추적을 위해 `@sentry/nextjs` 패키지를 사용합니다.
+
+```
+npm install @sentry/nextjs
+```
 
 ```
 NEXT_PUBLIC_SENTRY_DSN=
