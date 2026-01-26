@@ -1,11 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { createMockProject, getMockProjects } from "@/entities/project";
+import { captureApiError, parseJsonBody } from "@/shared/lib/monitoring";
 import {
   createSupabaseServerClient,
   hasSupabaseEnv,
   shouldUseMockProjects,
 } from "@/shared/supabase";
+
+const ROUTE = "/api/projects";
 
 function filterMockProjects(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
@@ -46,7 +49,15 @@ export async function GET(req: NextRequest) {
   if (status === "active" || status === "archived") query = query.eq("status", status);
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ message: error.message }, { status: 500 });
+  if (error) {
+    const errorId = captureApiError(error, {
+      route: ROUTE,
+      method: req.method,
+      status: 500,
+      details: { operation: "list_projects" },
+    });
+    return NextResponse.json({ message: error.message, errorId }, { status: 500 });
+  }
 
   return NextResponse.json(data ?? []);
 }
@@ -54,7 +65,15 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const hasEnv = hasSupabaseEnv();
   if (!hasEnv) {
-    const body = (await req.json().catch(() => null)) as { id?: string; name?: string } | null;
+    const parsed = await parseJsonBody<{ id?: string; name?: string }>(req, {
+      route: ROUTE,
+      method: req.method,
+      details: { operation: "create_project_mock" },
+    });
+    if (!parsed.ok) {
+      return NextResponse.json({ message: "invalid json", errorId: parsed.errorId }, { status: 400 });
+    }
+    const body = parsed.body;
     if (!body?.id || !body?.name) {
       return NextResponse.json({ message: "id/name required" }, { status: 400 });
     }
@@ -67,7 +86,15 @@ export async function POST(req: NextRequest) {
 
   const { data: claims } = await supabase.auth.getClaims();
   const useMock = shouldUseMockProjects({ hasEnv, hasClaims: Boolean(claims) });
-  const body = (await req.json().catch(() => null)) as { id?: string; name?: string } | null;
+  const parsed = await parseJsonBody<{ id?: string; name?: string }>(req, {
+    route: ROUTE,
+    method: req.method,
+    details: { operation: "create_project" },
+  });
+  if (!parsed.ok) {
+    return NextResponse.json({ message: "invalid json", errorId: parsed.errorId }, { status: 400 });
+  }
+  const body = parsed.body;
   if (!body?.id || !body?.name) {
     return NextResponse.json({ message: "id/name required" }, { status: 400 });
   }
@@ -85,7 +112,15 @@ export async function POST(req: NextRequest) {
     user_id: claims.claims.sub, // auth uid
   });
 
-  if (error) return NextResponse.json({ message: error.message }, { status: 400 });
+  if (error) {
+    const errorId = captureApiError(error, {
+      route: ROUTE,
+      method: req.method,
+      status: 400,
+      details: { operation: "insert_project" },
+    });
+    return NextResponse.json({ message: error.message, errorId }, { status: 400 });
+  }
 
   return NextResponse.json({ ok: true }, { status: 201 });
 }
