@@ -127,6 +127,12 @@ SENTRY_ENVIRONMENT=development
 - `src/instrumentation-client.ts`에서 브라우저 계측(Replay 포함)을 초기화합니다.
 - 직접 에러를 보낼 때는 `Sentry.captureException` 또는 `Sentry.captureMessage`를 사용합니다.
 
+이벤트/로그 확인:
+
+1. 개발 서버 실행 후, 클라이언트/서버에서 `Sentry.captureMessage` 또는 `Sentry.captureException`을 호출합니다.
+2. Sentry 대시보드의 Issues/Discover에서 이벤트 유입을 확인합니다.
+3. Replay 사용 시 Project → Replays에서 세션 기록을 확인합니다.
+
 ---
 
 ## 3) Tech Stack
