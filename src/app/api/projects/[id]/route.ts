@@ -1,13 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-import { findProject } from "@/entities/project";
-import { createSupabaseServerClient, hasSupabaseEnv } from "@/shared/supabase";
+import { deleteMockProject, findMockProject, updateMockProject } from "@/entities/project";
+import { createSupabaseServerClient, hasSupabaseEnv, shouldUseMockProjects } from "@/shared/supabase";
 
 export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
 
-  if (!hasSupabaseEnv()) {
-    const project = findProject(id);
+  const hasEnv = hasSupabaseEnv();
+  if (!hasEnv) {
+    const project = findMockProject(id);
     if (!project) return NextResponse.json({ message: "Not found" }, { status: 404 });
 
     return NextResponse.json(project);
@@ -15,6 +16,13 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
 
   const supabase = await createSupabaseServerClient();
   const { data: claims } = await supabase.auth.getClaims();
+  const useMock = shouldUseMockProjects({ hasEnv, hasClaims: Boolean(claims) });
+  if (useMock) {
+    const project = findMockProject(id);
+    if (!project) return NextResponse.json({ message: "Not found" }, { status: 404 });
+
+    return NextResponse.json(project);
+  }
   if (!claims) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   const { data, error } = await supabase
@@ -32,7 +40,8 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
 export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
 
-  if (!hasSupabaseEnv()) {
+  const hasEnv = hasSupabaseEnv();
+  if (!hasEnv) {
     const body = (await req.json().catch(() => null)) as {
       name?: string;
       status?: "active" | "archived";
@@ -41,16 +50,18 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
       return NextResponse.json({ message: "nothing to update" }, { status: 400 });
     }
 
-    const project = findProject(id);
-    if (!project) return NextResponse.json({ message: "Not found" }, { status: 404 });
+    const updated = updateMockProject(id, {
+      ...(body.name ? { name: body.name } : {}),
+      ...(body.status ? { status: body.status } : {}),
+    });
+    if (!updated) return NextResponse.json({ message: "Not found" }, { status: 404 });
 
     return NextResponse.json({ ok: true });
   }
 
   const supabase = await createSupabaseServerClient();
   const { data: claims } = await supabase.auth.getClaims();
-  if (!claims) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
+  const useMock = shouldUseMockProjects({ hasEnv, hasClaims: Boolean(claims) });
   const body = (await req.json().catch(() => null)) as {
     name?: string;
     status?: "active" | "archived";
@@ -58,6 +69,16 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
   if (!body?.name && !body?.status) {
     return NextResponse.json({ message: "nothing to update" }, { status: 400 });
   }
+  if (useMock) {
+    const updated = updateMockProject(id, {
+      ...(body.name ? { name: body.name } : {}),
+      ...(body.status ? { status: body.status } : {}),
+    });
+    if (!updated) return NextResponse.json({ message: "Not found" }, { status: 404 });
+
+    return NextResponse.json({ ok: true });
+  }
+  if (!claims) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   const { error } = await supabase
     .from("projects")
@@ -75,15 +96,23 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
 export async function DELETE(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
 
-  if (!hasSupabaseEnv()) {
-    const project = findProject(id);
-    if (!project) return NextResponse.json({ message: "Not found" }, { status: 404 });
+  const hasEnv = hasSupabaseEnv();
+  if (!hasEnv) {
+    const deleted = deleteMockProject(id);
+    if (!deleted) return NextResponse.json({ message: "Not found" }, { status: 404 });
 
     return NextResponse.json({ ok: true });
   }
 
   const supabase = await createSupabaseServerClient();
   const { data: claims } = await supabase.auth.getClaims();
+  const useMock = shouldUseMockProjects({ hasEnv, hasClaims: Boolean(claims) });
+  if (useMock) {
+    const deleted = deleteMockProject(id);
+    if (!deleted) return NextResponse.json({ message: "Not found" }, { status: 404 });
+
+    return NextResponse.json({ ok: true });
+  }
   if (!claims) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   const { error } = await supabase.from("projects").delete().eq("id", id);
