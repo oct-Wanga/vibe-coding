@@ -75,6 +75,20 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY= # 또는 NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 ---
 
+## 2-2) 관측/모니터링
+
+### Health Check
+
+간단한 헬스 체크 엔드포인트를 제공합니다.
+
+- `GET /api/health`
+
+### 구조화 로그 유틸
+
+`src/shared/lib/monitoring/logger.ts`의 유틸을 사용해 기본 JSON 로그를 남길 수 있습니다.
+
+---
+
 ## 3) Tech Stack
 
 ### Core
