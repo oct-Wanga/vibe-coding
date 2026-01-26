@@ -1,7 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { createMockProject, getMockProjects } from "@/entities/project";
-import { createSupabaseServerClient, hasSupabaseEnv, shouldUseMockProjects } from "@/shared/supabase";
+import {
+  createSupabaseServerClient,
+  hasSupabaseEnv,
+  shouldUseMockProjects,
+} from "@/shared/supabase";
 
 function filterMockProjects(req: NextRequest) {
   const sp = req.nextUrl.searchParams;

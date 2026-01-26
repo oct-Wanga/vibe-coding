@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { createMockProject, deleteMockProject, getMockProjects, updateMockProject } from "./mockStore";
+import {
+  createMockProject,
+  deleteMockProject,
+  getMockProjects,
+  updateMockProject,
+} from "./mockStore";
 
 describe("mockStore", () => {
   it("createMockProject는 목록에 추가한다", () => {

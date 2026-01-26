@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button, Card, CardContent, CardHeader, Input } from "@/shared/ui";
 
@@ -21,16 +21,18 @@ export function ProjectCreateForm() {
 
   const isInvalid = useMemo(() => name.trim().length === 0, [name]);
 
-  useEffect(() => {
-    if (mutation.isSuccess) {
-      setName("");
-      setId(createProjectId());
-    }
-  }, [mutation.isSuccess]);
-
   const handleSubmit = () => {
     if (isInvalid || mutation.isPending) return;
-    mutation.mutate({ id, name: name.trim() });
+
+    mutation.mutate(
+      { id, name: name.trim() },
+      {
+        onSuccess: () => {
+          setName("");
+          setId(createProjectId());
+        },
+      },
+    );
   };
 
   return (
@@ -55,12 +57,8 @@ export function ProjectCreateForm() {
           <Button type="button" onClick={handleSubmit} disabled={isInvalid || mutation.isPending}>
             생성
           </Button>
-          {mutation.isError ? (
-            <div className="text-xs text-red-600">생성에 실패했어요.</div>
-          ) : null}
-          {mutation.isSuccess ? (
-            <div className="text-xs text-green-600">생성 완료</div>
-          ) : null}
+          {mutation.isError ? <div className="text-xs text-red-600">생성에 실패했어요.</div> : null}
+          {mutation.isSuccess ? <div className="text-xs text-green-600">생성 완료</div> : null}
         </div>
       </CardContent>
     </Card>

@@ -30,10 +30,17 @@ export function ProjectDeleteButton({ id }: { id: string }) {
 
   return (
     <div className="flex items-center gap-2">
-      <Button type="button" variant="destructive" onClick={handleDelete} disabled={mutation.isPending}>
+      <Button
+        type="button"
+        variant="destructive"
+        onClick={handleDelete}
+        disabled={mutation.isPending}
+      >
         {confirmed ? "정말 삭제" : "삭제"}
       </Button>
-      {confirmed ? <div className="text-xs text-gray-500">한 번 더 클릭하면 삭제됩니다.</div> : null}
+      {confirmed ? (
+        <div className="text-xs text-gray-500">한 번 더 클릭하면 삭제됩니다.</div>
+      ) : null}
       {mutation.isError ? <div className="text-xs text-red-600">삭제 실패</div> : null}
     </div>
   );
