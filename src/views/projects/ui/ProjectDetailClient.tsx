@@ -3,6 +3,9 @@
 import Link from "next/link";
 
 import { useProject } from "@/entities/project";
+import { ProjectArchiveToggle } from "@/features/project-archive";
+import { ProjectDeleteButton } from "@/features/project-delete";
+import { ProjectUpdateForm } from "@/features/project-update";
 import { Badge, Card, CardContent, CardHeader } from "@/shared/ui";
 
 export function ProjectDetailClient({ id }: { id: string }) {
@@ -23,9 +26,16 @@ export function ProjectDetailClient({ id }: { id: string }) {
           <h1 className="text-xl font-semibold">{project.data.name}</h1>
           <div className="text-sm text-gray-500">ID: {project.data.id}</div>
         </CardHeader>
-        <CardContent className="flex items-center gap-2">
-          <div className="text-sm">Status</div>
-          <Badge>{project.data.status}</Badge>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="text-sm">Status</div>
+            <Badge>{project.data.status}</Badge>
+          </div>
+          <ProjectUpdateForm id={project.data.id} initialName={project.data.name} />
+          <div className="flex flex-wrap items-center gap-3">
+            <ProjectArchiveToggle id={project.data.id} status={project.data.status} />
+            <ProjectDeleteButton id={project.data.id} />
+          </div>
         </CardContent>
       </Card>
     </div>
