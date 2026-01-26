@@ -49,8 +49,7 @@ export default function SentryTestPage() {
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold">Sentry 오류 발생 테스트</h1>
         <p className="text-sm text-gray-600">
-          아래 버튼을 눌러 클라이언트/서버 오류 이벤트를 발생시키고 Sentry 대시보드에서
-          확인하세요.
+          아래 버튼을 눌러 클라이언트/서버 오류 이벤트를 발생시키고 Sentry 대시보드에서 확인하세요.
         </p>
       </div>
 
