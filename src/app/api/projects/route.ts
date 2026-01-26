@@ -1,29 +1,32 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { createMockProject, getMockProjects } from "@/entities/project";
-import { createSupabaseServerClient, hasSupabaseEnv } from "@/shared/supabase";
+import { createSupabaseServerClient, hasSupabaseEnv, shouldUseMockProjects } from "@/shared/supabase";
+
+function filterMockProjects(req: NextRequest) {
+  const sp = req.nextUrl.searchParams;
+  const q = sp.get("q")?.trim() ?? "";
+  const status = sp.get("status");
+
+  const mockProjects = getMockProjects();
+  const normalizedStatus = status === "active" || status === "archived" ? status : undefined;
+  return mockProjects.filter((project) => {
+    const matchesQ = q.length === 0 ? true : project.name.toLowerCase().includes(q.toLowerCase());
+    const matchesStatus = normalizedStatus ? project.status === normalizedStatus : true;
+    return matchesQ && matchesStatus;
+  });
+}
 
 export async function GET(req: NextRequest) {
-  if (!hasSupabaseEnv()) {
-    const sp = req.nextUrl.searchParams;
-    const q = sp.get("q")?.trim() ?? "";
-    const status = sp.get("status");
-
-    const mockProjects = getMockProjects();
-    const normalizedStatus = status === "active" || status === "archived" ? status : undefined;
-    const filtered = mockProjects.filter((project) => {
-      const matchesQ = q.length === 0 ? true : project.name.toLowerCase().includes(q.toLowerCase());
-      const matchesStatus = normalizedStatus ? project.status === normalizedStatus : true;
-      return matchesQ && matchesStatus;
-    });
-
-    return NextResponse.json(filtered);
-  }
+  const hasEnv = hasSupabaseEnv();
+  if (!hasEnv) return NextResponse.json(filterMockProjects(req));
 
   const supabase = await createSupabaseServerClient();
 
   // 보호: claims 기반 검증 권장 :contentReference[oaicite:11]{index=11}
   const { data: claims } = await supabase.auth.getClaims();
+  const useMock = shouldUseMockProjects({ hasEnv, hasClaims: Boolean(claims) });
+  if (useMock) return NextResponse.json(filterMockProjects(req));
   if (!claims) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   const sp = req.nextUrl.searchParams;
@@ -45,7 +48,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!hasSupabaseEnv()) {
+  const hasEnv = hasSupabaseEnv();
+  if (!hasEnv) {
     const body = (await req.json().catch(() => null)) as { id?: string; name?: string } | null;
     if (!body?.id || !body?.name) {
       return NextResponse.json({ message: "id/name required" }, { status: 400 });
@@ -58,12 +62,16 @@ export async function POST(req: NextRequest) {
   const supabase = await createSupabaseServerClient();
 
   const { data: claims } = await supabase.auth.getClaims();
-  if (!claims) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
+  const useMock = shouldUseMockProjects({ hasEnv, hasClaims: Boolean(claims) });
   const body = (await req.json().catch(() => null)) as { id?: string; name?: string } | null;
   if (!body?.id || !body?.name) {
     return NextResponse.json({ message: "id/name required" }, { status: 400 });
   }
+  if (useMock) {
+    const project = createMockProject({ id: body.id, name: body.name });
+    return NextResponse.json(project, { status: 201 });
+  }
+  if (!claims) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   // user_id는 RLS 정책(INSERT with check) 때문에 반드시 auth.uid()와 일치해야 함
   const { error } = await supabase.from("projects").insert({
