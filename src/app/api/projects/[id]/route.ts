@@ -63,7 +63,10 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
       details: { operation: "update_project_mock", projectId: id },
     });
     if (!parsed.ok) {
-      return NextResponse.json({ message: "invalid json", errorId: parsed.errorId }, { status: 400 });
+      return NextResponse.json(
+        { message: "invalid json", errorId: parsed.errorId },
+        { status: 400 },
+      );
     }
     const body = parsed.body;
     if (!body?.name && !body?.status) {

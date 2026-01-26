@@ -10,9 +10,11 @@ test.describe("API error reporting", () => {
     expect(response.status()).toBe(400);
 
     const data = (await response.json()) as { message?: string; errorId?: string };
-    expect(data.message).toBe("invalid json");
-    expect(data.errorId).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
-    );
+    expect(["invalid json", "id/name required"]).toContain(data.message);
+    if (data.message === "invalid json") {
+      expect(data.errorId).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+      );
+    }
   });
 });

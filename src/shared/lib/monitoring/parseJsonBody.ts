@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 
-import { captureApiError, type ApiErrorContext } from "./captureApiError";
+import { type ApiErrorContext, captureApiError } from "./captureApiError";
 
 type ParseResult<T> = { ok: true; body: T } | { ok: false; errorId: string };
 

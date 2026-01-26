@@ -185,6 +185,12 @@ const eslintConfig = defineConfig([
     rules: {
       "no-restricted-imports": "off",
       "@typescript-eslint/no-explicit-any": "off",
+      "unicorn/filename-case": [
+        "warn",
+        {
+          cases: { camelCase: true, pascalCase: true, kebabCase: true },
+        },
+      ],
     },
   },
 ]);
