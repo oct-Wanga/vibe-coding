@@ -71,7 +71,10 @@ export async function POST(req: NextRequest) {
       details: { operation: "create_project_mock" },
     });
     if (!parsed.ok) {
-      return NextResponse.json({ message: "invalid json", errorId: parsed.errorId }, { status: 400 });
+      return NextResponse.json(
+        { message: "invalid json", errorId: parsed.errorId },
+        { status: 400 },
+      );
     }
     const body = parsed.body;
     if (!body?.id || !body?.name) {
