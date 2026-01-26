@@ -15,39 +15,28 @@ function parseSampleRate(value: string | undefined): number {
 
 function resolveEnvironment(env: NodeJS.ProcessEnv): string {
   return (
-    env.SENTRY_ENVIRONMENT ??
-    env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ??
-    env.NODE_ENV ??
-    "development"
+    env.SENTRY_ENVIRONMENT ?? env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? env.NODE_ENV ?? "development"
   );
 }
 
-export function getSentryClientConfig(
-  env: NodeJS.ProcessEnv = process.env,
-) {
+export function getSentryClientConfig(env: NodeJS.ProcessEnv = process.env) {
   const dsn = env.NEXT_PUBLIC_SENTRY_DSN;
   if (!dsn) return null;
 
   return {
     dsn,
     environment: resolveEnvironment(env),
-    tracesSampleRate: clampSampleRate(
-      parseSampleRate(env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE),
-    ),
+    tracesSampleRate: clampSampleRate(parseSampleRate(env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE)),
   };
 }
 
-export function getSentryServerConfig(
-  env: NodeJS.ProcessEnv = process.env,
-) {
+export function getSentryServerConfig(env: NodeJS.ProcessEnv = process.env) {
   const dsn = env.SENTRY_DSN ?? env.NEXT_PUBLIC_SENTRY_DSN;
   if (!dsn) return null;
 
   return {
     dsn,
     environment: resolveEnvironment(env),
-    tracesSampleRate: clampSampleRate(
-      parseSampleRate(env.SENTRY_TRACES_SAMPLE_RATE),
-    ),
+    tracesSampleRate: clampSampleRate(parseSampleRate(env.SENTRY_TRACES_SAMPLE_RATE)),
   };
 }

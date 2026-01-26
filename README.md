@@ -70,6 +70,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY= # 또는 NEXT_PUBLIC_SUPABASE_ANON_KEY
 ```
 
 환경 변수가 없으면 `/api/projects` 관련 엔드포인트는 **mock 데이터**를 사용합니다.
+
 - mock 데이터는 `entities/project/model/mock.ts` 기준
 - `POST/PATCH/DELETE`는 성공 응답만 반환하고 **영구 저장은 하지 않습니다**
 
