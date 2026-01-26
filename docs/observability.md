@@ -63,7 +63,7 @@ src/shared/lib/monitoring/
 
 ## Sentry (무료 플랜 사용 가능)
 
-브라우저 오류 추적을 위해 `@sentry/nextjs` 패키지를 사용합니다.
+실제 운영 환경 기준으로 `@sentry/nextjs` 패키지와 공식 설정 파일을 사용합니다.
 
 설치:
 
@@ -74,11 +74,20 @@ npm install @sentry/nextjs
 필요 환경 변수:
 
 ```
+SENTRY_DSN=
 NEXT_PUBLIC_SENTRY_DSN=
 NEXT_PUBLIC_SENTRY_ENVIRONMENT=development
 NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE=0.1
+SENTRY_TRACES_SAMPLE_RATE=0.1
+SENTRY_ENVIRONMENT=development
 ```
 
 설정 여부 확인:
 
 - `GET /api/observability/sentry`
+
+설정 파일:
+
+- `sentry.client.config.ts`
+- `sentry.server.config.ts`
+- `sentry.edge.config.ts`
