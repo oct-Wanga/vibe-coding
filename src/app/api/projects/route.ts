@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { createMockProject, getMockProjects } from "@/entities/project";
+import { logError, logWarn, REQUEST_ID_HEADER, resolveRequestId } from "@/shared/lib/monitoring";
 import {
   createSupabaseServerClient,
   hasSupabaseEnv,
@@ -21,17 +22,38 @@ function filterMockProjects(req: NextRequest) {
   });
 }
 
+function withRequestId<T>(response: NextResponse<T>, requestId: string): NextResponse<T> {
+  response.headers.set(REQUEST_ID_HEADER, requestId);
+  return response;
+}
+
 export async function GET(req: NextRequest) {
+  const requestId = resolveRequestId(req.headers, () => crypto.randomUUID());
+  const route = new URL(req.url).pathname;
   const hasEnv = hasSupabaseEnv();
-  if (!hasEnv) return NextResponse.json(filterMockProjects(req));
+  if (!hasEnv) {
+    return withRequestId(NextResponse.json(filterMockProjects(req)), requestId);
+  }
 
   const supabase = await createSupabaseServerClient();
 
   // 보호: claims 기반 검증 권장 :contentReference[oaicite:11]{index=11}
   const { data: claims } = await supabase.auth.getClaims();
   const useMock = shouldUseMockProjects({ hasEnv, hasClaims: Boolean(claims) });
-  if (useMock) return NextResponse.json(filterMockProjects(req));
-  if (!claims) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  if (useMock) {
+    return withRequestId(NextResponse.json(filterMockProjects(req)), requestId);
+  }
+  if (!claims) {
+    logWarn("projects_list_unauthorized", {
+      requestId,
+      route,
+      status: 401,
+    });
+    return withRequestId(
+      NextResponse.json({ message: "Unauthorized" }, { status: 401 }),
+      requestId,
+    );
+  }
 
   const sp = req.nextUrl.searchParams;
   const q = sp.get("q")?.trim() ?? "";
@@ -46,21 +68,41 @@ export async function GET(req: NextRequest) {
   if (status === "active" || status === "archived") query = query.eq("status", status);
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ message: error.message }, { status: 500 });
+  if (error) {
+    logError("projects_list_failed", {
+      requestId,
+      route,
+      status: 500,
+    });
+    return withRequestId(
+      NextResponse.json({ message: error.message }, { status: 500 }),
+      requestId,
+    );
+  }
 
-  return NextResponse.json(data ?? []);
+  return withRequestId(NextResponse.json(data ?? []), requestId);
 }
 
 export async function POST(req: NextRequest) {
+  const requestId = resolveRequestId(req.headers, () => crypto.randomUUID());
+  const route = new URL(req.url).pathname;
   const hasEnv = hasSupabaseEnv();
   if (!hasEnv) {
     const body = (await req.json().catch(() => null)) as { id?: string; name?: string } | null;
     if (!body?.id || !body?.name) {
-      return NextResponse.json({ message: "id/name required" }, { status: 400 });
+      logWarn("projects_create_validation_failed", {
+        requestId,
+        route,
+        status: 400,
+      });
+      return withRequestId(
+        NextResponse.json({ message: "id/name required" }, { status: 400 }),
+        requestId,
+      );
     }
 
     const project = createMockProject({ id: body.id, name: body.name });
-    return NextResponse.json(project, { status: 201 });
+    return withRequestId(NextResponse.json(project, { status: 201 }), requestId);
   }
 
   const supabase = await createSupabaseServerClient();
@@ -69,13 +111,31 @@ export async function POST(req: NextRequest) {
   const useMock = shouldUseMockProjects({ hasEnv, hasClaims: Boolean(claims) });
   const body = (await req.json().catch(() => null)) as { id?: string; name?: string } | null;
   if (!body?.id || !body?.name) {
-    return NextResponse.json({ message: "id/name required" }, { status: 400 });
+    logWarn("projects_create_validation_failed", {
+      requestId,
+      route,
+      status: 400,
+    });
+    return withRequestId(
+      NextResponse.json({ message: "id/name required" }, { status: 400 }),
+      requestId,
+    );
   }
   if (useMock) {
     const project = createMockProject({ id: body.id, name: body.name });
-    return NextResponse.json(project, { status: 201 });
+    return withRequestId(NextResponse.json(project, { status: 201 }), requestId);
   }
-  if (!claims) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  if (!claims) {
+    logWarn("projects_create_unauthorized", {
+      requestId,
+      route,
+      status: 401,
+    });
+    return withRequestId(
+      NextResponse.json({ message: "Unauthorized" }, { status: 401 }),
+      requestId,
+    );
+  }
 
   // user_id는 RLS 정책(INSERT with check) 때문에 반드시 auth.uid()와 일치해야 함
   const { error } = await supabase.from("projects").insert({
@@ -85,7 +145,17 @@ export async function POST(req: NextRequest) {
     user_id: claims.claims.sub, // auth uid
   });
 
-  if (error) return NextResponse.json({ message: error.message }, { status: 400 });
+  if (error) {
+    logWarn("projects_create_failed", {
+      requestId,
+      route,
+      status: 400,
+    });
+    return withRequestId(
+      NextResponse.json({ message: error.message }, { status: 400 }),
+      requestId,
+    );
+  }
 
-  return NextResponse.json({ ok: true }, { status: 201 });
+  return withRequestId(NextResponse.json({ ok: true }, { status: 201 }), requestId);
 }

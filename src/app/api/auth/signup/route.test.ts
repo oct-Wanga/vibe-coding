@@ -24,6 +24,7 @@ describe("/api/auth/signup POST", () => {
 
     const res = await POST(req);
     expect(res.status).toBe(400);
+    expect(res.headers.get("x-request-id")).toBeTruthy();
 
     const json = (await res.json()) as { message?: string };
     expect(json.message).toBe("email/password required");
@@ -41,6 +42,7 @@ describe("/api/auth/signup POST", () => {
 
     const res = await POST(req);
     expect(res.status).toBe(400);
+    expect(res.headers.get("x-request-id")).toBeTruthy();
 
     const json = (await res.json()) as { message?: string };
     expect(json.message).toBe("User already registered");
@@ -61,6 +63,7 @@ describe("/api/auth/signup POST", () => {
 
     const res = await POST(req);
     expect(res.status).toBe(200);
+    expect(res.headers.get("x-request-id")).toBeTruthy();
 
     const json = (await res.json()) as {
       ok?: boolean;
@@ -88,6 +91,7 @@ describe("/api/auth/signup POST", () => {
 
     const res = await POST(req);
     expect(res.status).toBe(200);
+    expect(res.headers.get("x-request-id")).toBeTruthy();
 
     const json = (await res.json()) as { needsEmailConfirm?: boolean; userId?: string | null };
     expect(json.userId).toBe("u2");
