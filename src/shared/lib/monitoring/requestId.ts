@@ -9,3 +9,7 @@ export function ensureRequestId(existing: string | null, generate: RequestIdGene
 export function getRequestId(headers: Headers): string | undefined {
   return headers.get(REQUEST_ID_HEADER) ?? undefined;
 }
+
+export function resolveRequestId(headers: Headers, generate: RequestIdGenerator): string {
+  return ensureRequestId(getRequestId(headers) ?? null, generate);
+}
