@@ -27,10 +27,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
         route,
         status: 404,
       });
-      return withRequestId(
-        NextResponse.json({ message: "Not found" }, { status: 404 }),
-        requestId,
-      );
+      return withRequestId(NextResponse.json({ message: "Not found" }, { status: 404 }), requestId);
     }
 
     return withRequestId(NextResponse.json(project), requestId);
@@ -47,10 +44,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
         route,
         status: 404,
       });
-      return withRequestId(
-        NextResponse.json({ message: "Not found" }, { status: 404 }),
-        requestId,
-      );
+      return withRequestId(NextResponse.json({ message: "Not found" }, { status: 404 }), requestId);
     }
 
     return withRequestId(NextResponse.json(project), requestId);
@@ -79,10 +73,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
       route,
       status: 500,
     });
-    return withRequestId(
-      NextResponse.json({ message: error.message }, { status: 500 }),
-      requestId,
-    );
+    return withRequestId(NextResponse.json({ message: error.message }, { status: 500 }), requestId);
   }
   if (!data) {
     logWarn("projects_get_not_found", {
@@ -90,10 +81,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
       route,
       status: 404,
     });
-    return withRequestId(
-      NextResponse.json({ message: "Not found" }, { status: 404 }),
-      requestId,
-    );
+    return withRequestId(NextResponse.json({ message: "Not found" }, { status: 404 }), requestId);
   }
 
   return withRequestId(NextResponse.json(data), requestId);
@@ -132,10 +120,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
         route,
         status: 404,
       });
-      return withRequestId(
-        NextResponse.json({ message: "Not found" }, { status: 404 }),
-        requestId,
-      );
+      return withRequestId(NextResponse.json({ message: "Not found" }, { status: 404 }), requestId);
     }
 
     return withRequestId(NextResponse.json({ ok: true }), requestId);
@@ -170,10 +155,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
         route,
         status: 404,
       });
-      return withRequestId(
-        NextResponse.json({ message: "Not found" }, { status: 404 }),
-        requestId,
-      );
+      return withRequestId(NextResponse.json({ message: "Not found" }, { status: 404 }), requestId);
     }
 
     return withRequestId(NextResponse.json({ ok: true }), requestId);
@@ -204,10 +186,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
       route,
       status: 400,
     });
-    return withRequestId(
-      NextResponse.json({ message: error.message }, { status: 400 }),
-      requestId,
-    );
+    return withRequestId(NextResponse.json({ message: error.message }, { status: 400 }), requestId);
   }
 
   return withRequestId(NextResponse.json({ ok: true }), requestId);
@@ -227,10 +206,7 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
         route,
         status: 404,
       });
-      return withRequestId(
-        NextResponse.json({ message: "Not found" }, { status: 404 }),
-        requestId,
-      );
+      return withRequestId(NextResponse.json({ message: "Not found" }, { status: 404 }), requestId);
     }
 
     return withRequestId(NextResponse.json({ ok: true }), requestId);
@@ -247,10 +223,7 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
         route,
         status: 404,
       });
-      return withRequestId(
-        NextResponse.json({ message: "Not found" }, { status: 404 }),
-        requestId,
-      );
+      return withRequestId(NextResponse.json({ message: "Not found" }, { status: 404 }), requestId);
     }
 
     return withRequestId(NextResponse.json({ ok: true }), requestId);
@@ -274,10 +247,7 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
       route,
       status: 400,
     });
-    return withRequestId(
-      NextResponse.json({ message: error.message }, { status: 400 }),
-      requestId,
-    );
+    return withRequestId(NextResponse.json({ message: error.message }, { status: 400 }), requestId);
   }
 
   return withRequestId(NextResponse.json({ ok: true }), requestId);

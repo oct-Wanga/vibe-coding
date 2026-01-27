@@ -74,10 +74,7 @@ export async function GET(req: NextRequest) {
       route,
       status: 500,
     });
-    return withRequestId(
-      NextResponse.json({ message: error.message }, { status: 500 }),
-      requestId,
-    );
+    return withRequestId(NextResponse.json({ message: error.message }, { status: 500 }), requestId);
   }
 
   return withRequestId(NextResponse.json(data ?? []), requestId);
@@ -151,10 +148,7 @@ export async function POST(req: NextRequest) {
       route,
       status: 400,
     });
-    return withRequestId(
-      NextResponse.json({ message: error.message }, { status: 400 }),
-      requestId,
-    );
+    return withRequestId(NextResponse.json({ message: error.message }, { status: 400 }), requestId);
   }
 
   return withRequestId(NextResponse.json({ ok: true }, { status: 201 }), requestId);
