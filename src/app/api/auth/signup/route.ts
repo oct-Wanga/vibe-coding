@@ -1,19 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import type { SignupBody } from "@/entities/user";
-import { parseJsonBody } from "@/shared/lib/monitoring";
 import { createSupabaseServerClient } from "@/shared/supabase";
 
 export async function POST(req: NextRequest) {
   const supabase = await createSupabaseServerClient();
-  const parsed = await parseJsonBody<SignupBody>(req, {
-    route: "/api/auth/signup",
-    method: req.method,
-  });
-  if (!parsed.ok) {
-    return NextResponse.json({ message: "invalid json", errorId: parsed.errorId }, { status: 400 });
-  }
-  const body = parsed.body;
+  const body = (await req.json().catch(() => null)) as SignupBody;
 
   const email = body.email.trim();
   const password = body.password;

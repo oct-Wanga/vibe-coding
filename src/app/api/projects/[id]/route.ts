@@ -1,14 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { deleteMockProject, findMockProject, updateMockProject } from "@/entities/project";
-import { captureApiError, parseJsonBody } from "@/shared/lib/monitoring";
 import {
   createSupabaseServerClient,
   hasSupabaseEnv,
   shouldUseMockProjects,
 } from "@/shared/supabase";
-
-const ROUTE = "/api/projects/:id";
 
 export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
@@ -38,15 +35,7 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
     .eq("id", id)
     .maybeSingle();
 
-  if (error) {
-    const errorId = captureApiError(error, {
-      route: ROUTE,
-      method: "GET",
-      status: 500,
-      details: { operation: "get_project", projectId: id },
-    });
-    return NextResponse.json({ message: error.message, errorId }, { status: 500 });
-  }
+  if (error) return NextResponse.json({ message: error.message }, { status: 500 });
   if (!data) return NextResponse.json({ message: "Not found" }, { status: 404 });
 
   return NextResponse.json(data);
@@ -57,18 +46,10 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
 
   const hasEnv = hasSupabaseEnv();
   if (!hasEnv) {
-    const parsed = await parseJsonBody<{ name?: string; status?: "active" | "archived" }>(req, {
-      route: ROUTE,
-      method: req.method,
-      details: { operation: "update_project_mock", projectId: id },
-    });
-    if (!parsed.ok) {
-      return NextResponse.json(
-        { message: "invalid json", errorId: parsed.errorId },
-        { status: 400 },
-      );
-    }
-    const body = parsed.body;
+    const body = (await req.json().catch(() => null)) as {
+      name?: string;
+      status?: "active" | "archived";
+    } | null;
     if (!body?.name && !body?.status) {
       return NextResponse.json({ message: "nothing to update" }, { status: 400 });
     }
@@ -85,15 +66,10 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
   const supabase = await createSupabaseServerClient();
   const { data: claims } = await supabase.auth.getClaims();
   const useMock = shouldUseMockProjects({ hasEnv, hasClaims: Boolean(claims) });
-  const parsed = await parseJsonBody<{ name?: string; status?: "active" | "archived" }>(req, {
-    route: ROUTE,
-    method: req.method,
-    details: { operation: "update_project", projectId: id },
-  });
-  if (!parsed.ok) {
-    return NextResponse.json({ message: "invalid json", errorId: parsed.errorId }, { status: 400 });
-  }
-  const body = parsed.body;
+  const body = (await req.json().catch(() => null)) as {
+    name?: string;
+    status?: "active" | "archived";
+  } | null;
   if (!body?.name && !body?.status) {
     return NextResponse.json({ message: "nothing to update" }, { status: 400 });
   }
@@ -116,15 +92,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
     })
     .eq("id", id);
 
-  if (error) {
-    const errorId = captureApiError(error, {
-      route: ROUTE,
-      method: req.method,
-      status: 400,
-      details: { operation: "update_project", projectId: id },
-    });
-    return NextResponse.json({ message: error.message, errorId }, { status: 400 });
-  }
+  if (error) return NextResponse.json({ message: error.message }, { status: 400 });
 
   return NextResponse.json({ ok: true });
 }
@@ -152,15 +120,7 @@ export async function DELETE(_req: NextRequest, context: { params: Promise<{ id:
   if (!claims) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   const { error } = await supabase.from("projects").delete().eq("id", id);
-  if (error) {
-    const errorId = captureApiError(error, {
-      route: ROUTE,
-      method: "DELETE",
-      status: 400,
-      details: { operation: "delete_project", projectId: id },
-    });
-    return NextResponse.json({ message: error.message, errorId }, { status: 400 });
-  }
+  if (error) return NextResponse.json({ message: error.message }, { status: 400 });
 
   return NextResponse.json({ ok: true });
 }
