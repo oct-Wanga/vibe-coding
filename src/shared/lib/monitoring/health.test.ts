@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { createHealthPayload } from "./health";
+import { createHealthLogContext, createHealthPayload } from "./health";
 
 describe("createHealthPayload", () => {
   it("returns a stable payload", () => {
@@ -11,6 +11,16 @@ describe("createHealthPayload", () => {
       timestamp: "2025-01-02T03:04:05.000Z",
       environment: "test",
       requestId: "req-1",
+    });
+  });
+
+  it("creates a log context from payload", () => {
+    const payload = createHealthPayload(new Date("2025-01-02T03:04:05.000Z"), "test", "req-2");
+
+    expect(createHealthLogContext(payload)).toEqual({
+      status: "ok",
+      environment: "test",
+      requestId: "req-2",
     });
   });
 });

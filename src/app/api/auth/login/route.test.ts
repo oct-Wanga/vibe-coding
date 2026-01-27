@@ -24,6 +24,7 @@ describe("/api/auth/login POST", () => {
 
     const res = await POST(req);
     expect(res.status).toBe(400);
+    expect(res.headers.get("x-request-id")).toBeTruthy();
 
     const json = (await res.json()) as { message?: string };
     expect(json.message).toBe("email/password required");
@@ -41,6 +42,7 @@ describe("/api/auth/login POST", () => {
 
     const res = await POST(req);
     expect(res.status).toBe(401);
+    expect(res.headers.get("x-request-id")).toBeTruthy();
 
     const json = (await res.json()) as { message?: string };
     expect(json.message).toBe("Invalid login");
@@ -58,6 +60,7 @@ describe("/api/auth/login POST", () => {
 
     const res = await POST(req);
     expect(res.status).toBe(200);
+    expect(res.headers.get("x-request-id")).toBeTruthy();
 
     const json = (await res.json()) as { ok?: boolean };
     expect(json.ok).toBe(true);

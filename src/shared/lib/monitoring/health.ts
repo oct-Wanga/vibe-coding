@@ -5,6 +5,12 @@ export type HealthPayload = {
   requestId?: string;
 };
 
+export type HealthLogContext = {
+  status: "ok";
+  environment: string;
+  requestId?: string;
+};
+
 export function createHealthPayload(
   now: Date,
   environment: string,
@@ -15,6 +21,14 @@ export function createHealthPayload(
     timestamp: now.toISOString(),
     environment,
     ...(requestId ? { requestId } : {}),
+  };
+}
+
+export function createHealthLogContext(payload: HealthPayload): HealthLogContext {
+  return {
+    status: payload.status,
+    environment: payload.environment,
+    ...(payload.requestId ? { requestId: payload.requestId } : {}),
   };
 }
 
