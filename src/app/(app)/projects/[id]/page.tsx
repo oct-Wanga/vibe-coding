@@ -1,10 +1,6 @@
 import { ProjectDetailClient } from "@/views/projects";
 
-export default async function ProjectDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   return <ProjectDetailClient id={id} />;
