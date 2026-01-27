@@ -2,12 +2,12 @@ import { PROJECT_STATUS } from "@/shared/lib/projectSearchParams";
 import { getEnumParam, getStringParam } from "@/shared/lib/searchParams";
 import { ProjectsPageClient } from "@/views/projects";
 
-export default async function ProjectsPage({
+export default function ProjectsPage({
   searchParams,
 }: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
+  searchParams: Record<string, string | string[] | undefined>;
 }) {
-  const sp = await searchParams;
+  const sp = searchParams;
 
   const q = getStringParam(sp, "q") ?? "";
   const status = getEnumParam(sp, "status", PROJECT_STATUS) ?? "all";

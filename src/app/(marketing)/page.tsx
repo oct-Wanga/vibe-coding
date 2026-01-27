@@ -9,12 +9,8 @@ function toMode(v: string): Mode {
   return v === "signup" ? "signup" : "login";
 }
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: Promise<SearchParamsLike>;
-}) {
-  const sp = await searchParams;
+export default function HomePage({ searchParams }: { searchParams: SearchParamsLike }) {
+  const sp = searchParams;
   const mode = toMode(getStringParam(sp, "auth") ?? "login");
 
   return (

@@ -10,8 +10,8 @@ import {
 
 const ROUTE = "/api/projects/:id";
 
-export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
-  const { id } = await context.params;
+export async function GET(_req: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
 
   const hasEnv = hasSupabaseEnv();
   if (!hasEnv) {
@@ -52,8 +52,8 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
   return NextResponse.json(data);
 }
 
-export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
-  const { id } = await context.params;
+export async function PATCH(req: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
 
   const hasEnv = hasSupabaseEnv();
   if (!hasEnv) {
@@ -129,8 +129,8 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
   return NextResponse.json({ ok: true });
 }
 
-export async function DELETE(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
-  const { id } = await context.params;
+export async function DELETE(_req: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
 
   const hasEnv = hasSupabaseEnv();
   if (!hasEnv) {
