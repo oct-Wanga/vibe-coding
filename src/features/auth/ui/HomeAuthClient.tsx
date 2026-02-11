@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
+import { ScreenRtc } from "@/features/rtc";
 import { setParam } from "@/shared/lib/searchParams";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/shared/ui";
 
@@ -66,6 +67,9 @@ export function HomeAuthClient({ initialMode }: { initialMode: Mode }) {
           {mode === "login" ? <LoginForm /> : <SignupForm />}
         </CardContent>
       </Card>
+      <div>
+        <ScreenRtc />
+      </div>
     </div>
   );
 }

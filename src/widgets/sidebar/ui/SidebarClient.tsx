@@ -7,8 +7,11 @@ import { routes } from "@/shared/config/routes";
 import { useUiStore } from "@/shared/stores/useUiStore";
 
 const nav = [
+  { label: "메인", href: routes.home },
   { label: "Dashboard", href: routes.dashboard },
   { label: "Projects", href: routes.projects },
+  { label: "Discovery", href: routes.discovery },
+  { label: "Canvas", href: routes.canvas },
 ];
 
 export function SidebarClient({ children }: { children?: ReactNode }) {

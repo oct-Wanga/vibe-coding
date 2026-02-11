@@ -1,23 +1,10 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-
-import { type LoginInput, loginSchema, useLogin } from "@/features/auth";
+import { useLoginForm } from "@/features/auth";
 import { Button, Input, Label } from "@/shared/ui";
 
 export function LoginForm() {
-  const login = useLogin();
-
-  const form = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
-    mode: "onSubmit",
-  });
-
-  const onSubmit = (values: LoginInput) => {
-    login.mutate(values);
-  };
+  const { form, isPending, isSuccess, isError, onSubmit } = useLoginForm();
 
   return (
     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -30,7 +17,9 @@ export function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password" className={"bg-yellow-300"}>
+          Password
+        </Label>
         <Input
           id="password"
           type="password"
@@ -43,12 +32,12 @@ export function LoginForm() {
       </div>
 
       <div className="flex items-center gap-3 pt-1">
-        <Button type="submit" disabled={login.isPending}>
-          {login.isPending ? "Signing in..." : "Sign in"}
+        <Button type="submit" disabled={isPending}>
+          {isPending ? "Signing in..." : "Sign in"}
         </Button>
 
-        {login.isSuccess ? <span className="text-sm text-green-700">OK</span> : null}
-        {login.isError ? <span className="text-sm text-red-700">Fail</span> : null}
+        {isSuccess ? <span className="text-sm text-green-700">OK</span> : null}
+        {isError ? <span className="text-sm text-red-700">Fail</span> : null}
       </div>
     </form>
   );

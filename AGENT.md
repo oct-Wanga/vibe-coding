@@ -2,9 +2,11 @@
 
 > React 19 / Next(App Router) / TypeScript 기준
 >
->
 > 목표: **리뷰 기준 통일 · 유지보수 비용 감소 · 버그 예방**
->
+
+## Context rules
+
+- Never read or search generated folders: `.next/`, `node_modules/`, `dist/`, `build/`.
 
 ---
 
@@ -30,12 +32,10 @@
 
 ```tsx
 // bad
-function q() {
-}
+function q() {}
 
 // good
-function queryProjects() {
-}
+function queryProjects() {}
 ```
 
 ### ✅ 접두어/동사 규칙
@@ -102,8 +102,7 @@ export const API_BASE_URL = "https://api.example.com";
 
 type UserProfile = { id: string };
 
-function LoginForm() {
-}
+function LoginForm() {}
 ```
 
 ---
@@ -132,7 +131,6 @@ let a = (b = c = 1);
 const c = 1;
 const b = c;
 const a = c;
-
 ```
 
 ### ✅ 선언 위치/순서
@@ -192,7 +190,7 @@ const obj = {
 
 ```tsx
 const example: Record<string, unknown> = {};
-Object.hasOwn(example, "prop");// false
+Object.hasOwn(example, "prop"); // false
 ```
 
 ### ✅ spread/rest 선호
@@ -221,7 +219,6 @@ const copy = [...items];
 ```tsx
 const arrLike = { 0: "a", 1: "b", length: 2 };
 const arr = Array.from(arrLike);
-
 ```
 
 ### ✅ 콜백 return 명확히
@@ -296,8 +293,7 @@ function sum(...args: number[]) {
 - default export 최소화
 
 ```tsx
-export function parseApiError() {
-}
+export function parseApiError() {}
 ```
 
 ---
@@ -403,9 +399,7 @@ if (!isRunning) {
 /**
  * 외부 API rate limit이 있어 캐시를 우선 사용한다.
  */
-export function getBillingHistory() {
-}
-
+export function getBillingHistory() {}
 ```
 
 ---
@@ -432,7 +426,7 @@ return baz;
 const s = String(value);
 const n = Number(input);
 const i = parseInt(input, 10);
-const ok = Boolean(value);// 또는 !!value (팀 통일)
+const ok = Boolean(value); // 또는 !!value (팀 통일)
 ```
 
 ---
@@ -492,9 +486,9 @@ import { SidebarClient } from "@/widgets/sidebar/ui/SidebarClient";
 
 ## ✅ 팀 체크리스트(리뷰용)
 
-- [ ]  이벤트 네이밍 `onX / handleX` 지켰나?
-- [ ]  `any` 쓰지 않았나? (`unknown` + 가드)
-- [ ]  Server/Client 훅 호출 위치 맞나?
-- [ ]  비교/조건문이 의도 명확한가?
-- [ ]  export는 named 위주인가?
-- [ ]  딥임포트 없이 public API로 가져왔나?
+- [ ] 이벤트 네이밍 `onX / handleX` 지켰나?
+- [ ] `any` 쓰지 않았나? (`unknown` + 가드)
+- [ ] Server/Client 훅 호출 위치 맞나?
+- [ ] 비교/조건문이 의도 명확한가?
+- [ ] export는 named 위주인가?
+- [ ] 딥임포트 없이 public API로 가져왔나?

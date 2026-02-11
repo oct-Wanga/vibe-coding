@@ -1,12 +1,14 @@
-"use client";
+﻿"use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { List } from "react-window";
 
+import type { Project } from "@/entities/project";
 import { useProjects } from "@/entities/project";
+import { Item } from "@/features/project-list";
 import type { ProjectStatusFilter } from "@/shared/lib/projectSearchParams";
 import { readProjectsFilters } from "@/shared/lib/projectSearchParams";
-import { Badge, Card, CardContent } from "@/shared/ui";
+import { Card, CardContent } from "@/shared/ui";
 
 export function ProjectsList({
   initialQ,
@@ -23,28 +25,56 @@ export function ProjectsList({
     status,
   });
 
+  const testData: Project[] = [
+    {
+      created_at: "2021-05-05",
+      id: "p_999",
+      name: "Alpha",
+      status: "active",
+      updated_at: "2021-05-06",
+    },
+    {
+      created_at: "2021-05-05",
+      id: "p_998",
+      name: "Alpha",
+      status: "active",
+      updated_at: "2021-05-06",
+    },
+    {
+      created_at: "2021-05-05",
+      id: "p_997",
+      name: "Alpha",
+      status: "active",
+      updated_at: "2021-05-06",
+    },
+    {
+      created_at: "2021-05-05",
+      id: "p_996",
+      name: "Alpha",
+      status: "active",
+      updated_at: "2021-05-06",
+    },
+    {
+      created_at: "2021-05-05",
+      id: "p_995",
+      name: "Alpha",
+      status: "active",
+      updated_at: "2021-05-06",
+    },
+  ];
+  const data = [...(projects?.data ?? []), ...testData];
+
   return (
     <Card>
       <CardContent>
         {projects.isLoading ? <div className="text-sm text-gray-500">Loading...</div> : null}
         {projects.isError ? <div className="text-sm text-red-600">Failed to load</div> : null}
 
-        {projects.data ? (
-          <ul className="divide-y">
-            {projects.data.map((p) => (
-              <li key={p.id} className="flex items-center justify-between py-2">
-                <div className="space-y-1">
-                  <div className="text-sm font-medium">{p.name}</div>
-                  <Badge>{p.status}</Badge>
-                </div>
-
-                <Link className="text-sm underline" href={`/projects/${p.id}`}>
-                  Open
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        <div className="divide-y  overflow-auto" style={{ height: "300px" }}>
+          {data ? (
+            <List rowCount={data.length} rowHeight={64} rowProps={{ data }} rowComponent={Item} />
+          ) : null}
+        </div>
       </CardContent>
     </Card>
   );
