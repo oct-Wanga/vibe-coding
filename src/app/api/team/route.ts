@@ -18,13 +18,9 @@ function normalizeUser(raw: UnknownRecord): User | null {
   const id = getString(raw.id);
   if (!id) return null;
 
-  const name =
-    getString(raw.name) ??
-    getString(raw.full_name) ??
-    getString(raw.display_name) ??
-    null;
+  const name = getString(raw.name) ?? getString(raw.full_name) ?? null;
   const email = getString(raw.email) ?? "";
-  const imageUrl = getString(raw.image_url) ?? getString(raw.avatar_url) ?? null;
+  const imageUrl = getString(raw.avatar_url) ?? null;
   const roleRaw = getString(raw.role);
   const role = roleRaw === "admin" || roleRaw === "member" ? roleRaw : undefined;
 

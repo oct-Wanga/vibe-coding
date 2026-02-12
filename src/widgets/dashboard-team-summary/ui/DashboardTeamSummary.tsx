@@ -1,5 +1,5 @@
 import { getUserDisplayName, UserAvatar, useTeamMembers } from "@/entities/user";
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "@/shared/ui";
+import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState } from "@/shared/ui";
 
 export function DashboardTeamSummary() {
   const teamQuery = useTeamMembers();
@@ -14,7 +14,7 @@ export function DashboardTeamSummary() {
         {teamQuery.isLoading ? <div className="text-sm text-muted-foreground">Loading...</div> : null}
         {teamQuery.isError ? <div className="text-sm text-red-600">Failed to load</div> : null}
         {!teamQuery.isLoading && members.length === 0 ? (
-          <div className="text-sm text-muted-foreground">No team members.</div>
+          <EmptyState title="No team members." description="Invite teammates to get started." />
         ) : null}
         {members.length > 0 ? (
           <ul className="space-y-3">

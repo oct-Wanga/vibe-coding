@@ -1,6 +1,6 @@
 import type { ActivityType } from "@/entities/activity";
 import { useActivities } from "@/entities/activity";
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "@/shared/ui";
+import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState } from "@/shared/ui";
 
 const typeStyles: Record<ActivityType, { label: string; className: string }> = {
   project: { label: "Project", className: "bg-blue-100 text-blue-700" },
@@ -23,7 +23,7 @@ export function DashboardActivity() {
         ) : null}
         {activityQuery.isError ? <div className="text-sm text-red-600">Failed to load</div> : null}
         {!activityQuery.isLoading && activities.length === 0 ? (
-          <div className="text-sm text-muted-foreground">No activity yet.</div>
+          <EmptyState title="No activity yet." description="Recent changes will show up here." />
         ) : null}
         {activities.length > 0 ? (
           <ul className="space-y-4">

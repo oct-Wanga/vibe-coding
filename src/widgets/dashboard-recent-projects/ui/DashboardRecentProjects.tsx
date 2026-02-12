@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 
 import { useProjects } from "@/entities/project";
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "@/shared/ui";
+import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState } from "@/shared/ui";
 
 export function DashboardRecentProjects() {
   const projectsQuery = useProjects({});
@@ -24,7 +24,10 @@ export function DashboardRecentProjects() {
         {projectsQuery.isLoading ? <div className="text-sm text-muted-foreground">Loading...</div> : null}
         {projectsQuery.isError ? <div className="text-sm text-red-600">Failed to load</div> : null}
         {!projectsQuery.isLoading && recent.length === 0 ? (
-          <div className="text-sm text-muted-foreground">No projects yet.</div>
+          <EmptyState
+            title="No projects yet."
+            description="Create your first project to see it here."
+          />
         ) : null}
         {recent.length > 0 ? (
           <ul className="space-y-3">
