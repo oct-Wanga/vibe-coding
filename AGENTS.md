@@ -1,108 +1,42 @@
 ---
-description: "Core Rules: layer direction, public API, import boundaries (헌법)"
+description: "Global Operating Rules (최우선)"
 globs:
-  - "src/**/*.{ts,tsx,js,jsx}"
+  - "**/*"
 ---
 
-# Core Architecture Rules (Immutable)
+# Rule Priority (최우선)
 
-너는 이 레포의 아키텍처를 보호하는 시니어 FE 엔지니어다.
-아래 규칙은 예외 없이 준수한다. 위반이 보이면 기능 구현보다 **구조/의존성부터 고친다.**
+이 문서는 에이전트가 이 저장소에서 작업할 때 **가장 먼저 읽고 항상 준수해야 하는 전역 운영 규칙**이다.
 
-## 1) Core
+## 0) 우선순위 체계
 
-- Next.js (App Router)
-- React + TypeScript (strict)
+1. 시스템/개발자/사용자의 직접 지시
+2. 이 `AGENTS.md`
+3. `docs/rules/*.md` (세부 실행 규칙)
+4. 일반 관례
 
----
+충돌 시 상위 우선순위를 따른다.
 
-## 2) Styling / UI
+## 0-1) docs/rules 강제 로딩 규칙
 
-- Tailwind CSS 기반
-- UI 컴포넌트는 프로젝트 표준(shadcn/ui 등)이 있으면 그걸 우선
-  금지(프로젝트 표준과 충돌 시):
-- styled-components / emotion (팀 표준이 Tailwind라면)
+작업 시작 전 `docs/rules/*.md`를 우선 확인하고, 변경 범위와 가장 관련 높은 규칙을 적용한다.
 
----
+- 핵심 우선 문서:
+  - `docs/rules/00-core.md` (레이어/의존성/Public API/타입 안전)
+  - `docs/rules/05-tech-stack.md` (기술 스택/금지 대체재/도입 원칙)
+  - `docs/rules/30-structure.md` (디렉터리 구조)
+  - `docs/rules/70-testing.md` (테스트 기준)
+- 그 외 규칙 문서도 변경 맥락에 맞게 반드시 확인한다.
 
-## 3) Data / State
+## 0-2) 중복 관리 원칙
 
-- Server State: React Query(@tanstack/react-query) 또는 RSC(Server) 패칭
-- Global UI State: Zustand(선호) — 단, 서버 데이터 저장 금지
-  금지(팀 표준이 아니라면):
-- Redux/MobX/Recoil/SWR
+- 동일 규칙을 여러 문서에 장문으로 반복하지 않는다.
+- 상세 기준의 단일 진실 공급원(SSOT)은 `docs/rules/*.md`다.
+- `AGENTS.md`는 우선순위/적용 순서/검토 체크리스트만 유지한다.
 
----
+## 0-3) 작업 전/후 체크리스트
 
-## 4) Track(프로젝트 데이터 패턴) — 혼용 금지
+- 작업 전: 변경 범위에 맞는 `docs/rules/*.md`를 읽고 적용 규칙을 확정한다.
+- 작업 중: 규칙 충돌 시 우선순위 체계를 기준으로 즉시 조정한다.
+- 작업 후: 변경 사항이 `00-core`, `05-tech-stack` 규칙과 충돌하지 않는지 재검토한다.
 
-프로젝트는 아래 중 **하나의 Track을 선택**한다. (혼용은 예외 케이스만 허용)
-
-- Track A (FE가 API Consumer): Client 중심(React Query), 필요 시 BFF(Route Handler)로 프록시
-- Track B (Next 풀스택): Server 중심(RSC/Server Actions), Client는 인터랙션 구간만
-
-※ 인증/DB는 **한 트랙으로만** 구성한다(중복/혼재 금지).
-
----
-
-## 5) 신규 라이브러리 도입 기준
-
-- 기존 스택으로 해결 가능하면 추가 금지
-- 추가 시 체크:
-  - RSC/SSR 호환성
-  - 번들 사이즈 영향
-  - 유지보수 소유자/대체재 비교
-
----
-
-## 6) 레이어 방향 (절대)
-
-허용 방향:
-
-app → views → widgets → features → entities → shared
-
-금지:
-
-- 하위 레이어가 상위 레이어 import
-- shared/entities가 features/widgets/views/app import
-- features가 views/app import
-
----
-
-## 7) Public API 강제
-
-다음 레이어는 **반드시 각 모듈의 `index.ts`만 통해서 import**:
-
-- views/*
-- widgets/*
-- features/*
-- entities/*
-
-금지(딥 임포트):
-
-- `@/features/x/ui/...`
-- `@/entities/y/model/...`
-
-허용:
-
-- `@/features/x`
-- `@/entities/y`
-
-딥 임포트가 필요해 보이면 → **index.ts에 export를 올려 해결**한다.
-
----
-
-## 8) 경로/alias
-
-- import는 `@/` alias 우선
-- `../../..` 같은 상대경로는 금지(불가피하면 리팩토링)
-
----
-
-## 9) 타입 안전성
-
-- `any` 금지
-- 모르는 값은 `unknown` + 타입가드
-- 외부 입출력(API/폼/스토리지)은 타입과 검증(zod 등)을 반드시 둔다.
-
----
