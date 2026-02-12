@@ -1,26 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-import { createMockProject, getMockProjects } from "@/entities/project";
 import { logError, logWarn, REQUEST_ID_HEADER, resolveRequestId } from "@/shared/lib/monitoring";
-import {
-  createSupabaseServerClient,
-  hasSupabaseEnv,
-  shouldUseMockProjects,
-} from "@/shared/supabase";
-
-function filterMockProjects(req: NextRequest) {
-  const sp = req.nextUrl.searchParams;
-  const q = sp.get("q")?.trim() ?? "";
-  const status = sp.get("status");
-
-  const mockProjects = getMockProjects();
-  const normalizedStatus = status === "active" || status === "archived" ? status : undefined;
-  return mockProjects.filter((project) => {
-    const matchesQ = q.length === 0 ? true : project.name.toLowerCase().includes(q.toLowerCase());
-    const matchesStatus = normalizedStatus ? project.status === normalizedStatus : true;
-    return matchesQ && matchesStatus;
-  });
-}
+import { createSupabaseServerClient, hasSupabaseEnv } from "@/shared/supabase";
 
 function withRequestId<T>(response: NextResponse<T>, requestId: string): NextResponse<T> {
   response.headers.set(REQUEST_ID_HEADER, requestId);
@@ -32,17 +13,21 @@ export async function GET(req: NextRequest) {
   const route = new URL(req.url).pathname;
   const hasEnv = hasSupabaseEnv();
   if (!hasEnv) {
-    return withRequestId(NextResponse.json(filterMockProjects(req)), requestId);
+    logError("projects_list_missing_env", {
+      requestId,
+      route,
+      status: 500,
+    });
+    return withRequestId(
+      NextResponse.json({ message: "Supabase env missing" }, { status: 500 }),
+      requestId,
+    );
   }
 
   const supabase = await createSupabaseServerClient();
 
   // 보호: claims 기반 검증 권장 :contentReference[oaicite:11]{index=11}
   const { data: claims } = await supabase.auth.getClaims();
-  const useMock = shouldUseMockProjects({ hasEnv, hasClaims: Boolean(claims) });
-  if (useMock) {
-    return withRequestId(NextResponse.json(filterMockProjects(req)), requestId);
-  }
   if (!claims) {
     logWarn("projects_list_unauthorized", {
       requestId,
@@ -85,27 +70,20 @@ export async function POST(req: NextRequest) {
   const route = new URL(req.url).pathname;
   const hasEnv = hasSupabaseEnv();
   if (!hasEnv) {
-    const body = (await req.json().catch(() => null)) as { id?: string; name?: string } | null;
-    if (!body?.id || !body?.name) {
-      logWarn("projects_create_validation_failed", {
-        requestId,
-        route,
-        status: 400,
-      });
-      return withRequestId(
-        NextResponse.json({ message: "id/name required" }, { status: 400 }),
-        requestId,
-      );
-    }
-
-    const project = createMockProject({ id: body.id, name: body.name });
-    return withRequestId(NextResponse.json(project, { status: 201 }), requestId);
+    logError("projects_create_missing_env", {
+      requestId,
+      route,
+      status: 500,
+    });
+    return withRequestId(
+      NextResponse.json({ message: "Supabase env missing" }, { status: 500 }),
+      requestId,
+    );
   }
 
   const supabase = await createSupabaseServerClient();
 
   const { data: claims } = await supabase.auth.getClaims();
-  const useMock = shouldUseMockProjects({ hasEnv, hasClaims: Boolean(claims) });
   const body = (await req.json().catch(() => null)) as { id?: string; name?: string } | null;
   if (!body?.id || !body?.name) {
     logWarn("projects_create_validation_failed", {
@@ -117,10 +95,6 @@ export async function POST(req: NextRequest) {
       NextResponse.json({ message: "id/name required" }, { status: 400 }),
       requestId,
     );
-  }
-  if (useMock) {
-    const project = createMockProject({ id: body.id, name: body.name });
-    return withRequestId(NextResponse.json(project, { status: 201 }), requestId);
   }
   if (!claims) {
     logWarn("projects_create_unauthorized", {

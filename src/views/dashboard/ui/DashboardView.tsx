@@ -1,17 +1,21 @@
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@/shared/ui";
+import { Button } from "@/shared/ui";
+import { DashboardActivity } from "@/widgets/dashboard-activity";
+import { DashboardKpis } from "@/widgets/dashboard-kpis";
 import { DashboardLayout } from "@/widgets/dashboard-layout";
+import { DashboardRecentProjects } from "@/widgets/dashboard-recent-projects";
+import { DashboardTeamSummary } from "@/widgets/dashboard-team-summary";
 
 export function DashboardView() {
   return (
     <DashboardLayout title="Dashboard" actions={<Button variant="outline">Refresh</Button>}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Overview</CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm text-muted-foreground">
-          shadcn/ui Card + Button 적용 예시
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <DashboardKpis />
+        <div className="grid gap-4 lg:grid-cols-[2fr,1fr]">
+          <DashboardRecentProjects />
+          <DashboardTeamSummary />
+        </div>
+        <DashboardActivity />
+      </div>
     </DashboardLayout>
   );
 }

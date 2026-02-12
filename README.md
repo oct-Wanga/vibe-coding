@@ -60,7 +60,7 @@ npm run test:e2e:ui
 
 ---
 
-## 2-1) 환경 변수 / Mock 모드
+## 2-1) 환경 변수
 
 Supabase 연동을 사용하려면 아래 환경 변수가 필요합니다.
 
@@ -69,10 +69,8 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY= # 또는 NEXT_PUBLIC_SUPABASE_ANON_KEY
 ```
 
-환경 변수가 없으면 `/api/projects` 관련 엔드포인트는 **mock 데이터**를 사용합니다.
-
-- mock 데이터는 `entities/project/model/mock.ts` 기준
-- `POST/PATCH/DELETE`는 성공 응답만 반환하고 **영구 저장은 하지 않습니다**
+환경 변수가 없으면 `/api/projects`, `/api/team`, `/api/activity` 엔드포인트는
+Supabase 연결 오류(500)를 반환합니다.
 
 ---
 
@@ -300,8 +298,10 @@ export default async function Page({
 - `/dashboard` : 대시보드 예시
 - `/projects` : 프로젝트 목록 + URL 필터 + React Query
 - `/projects/[id]` : 프로젝트 상세
-- `/api/projects` : mock 데이터 목록 API
-- `/api/projects/[id]` : mock 데이터 상세 API
+- `/api/projects` : 프로젝트 목록 API
+- `/api/projects/[id]` : 프로젝트 상세 API
+- `/api/team` : 팀 멤버 목록 API
+- `/api/activity` : 활동 로그 API
 
 ---
 
@@ -320,5 +320,4 @@ import { Button, Card, Input, Select } from "@/shared/ui";
 
 ## 11) 참고
 
-- 이 레포의 프로젝트 데이터는 `entities/project/model/mock.ts`에 **mock**으로 들어 있습니다.
 - 실제 프로젝트에서는 `entities/*/api`에서 BFF(Route Handlers) 또는 외부 API 서버를 붙이면 됩니다.
