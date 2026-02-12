@@ -1,6 +1,11 @@
 import { expect, test } from "@playwright/test";
+import { loginAsTestUser } from "./utils/auth";
 
 test.describe("Projects CRUD (/projects)", () => {
+  test.beforeEach(async ({ page }) => {
+    await loginAsTestUser(page);
+  });
+
   test("create, update, archive, delete flow", async ({ page }) => {
     const uniqueId = `p_e2e_${Date.now()}`;
     const projectName = `E2E Project ${uniqueId}`;
@@ -37,7 +42,7 @@ test.describe("Projects CRUD (/projects)", () => {
     await expect(page.locator("li", { hasText: updatedName })).toHaveCount(0);
   });
 
-  test("create project shows in list without auth", async ({ page }) => {
+  test("create project shows in list", async ({ page }) => {
     const uniqueId = `p_e2e_list_${Date.now()}`;
     const projectName = `E2E List ${uniqueId}`;
 

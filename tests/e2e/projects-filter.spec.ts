@@ -1,6 +1,11 @@
 import { expect, test } from "@playwright/test";
+import { loginAsTestUser } from "./utils/auth";
 
 test.describe("Projects filter (/projects)", () => {
+  test.beforeEach(async ({ page }) => {
+    await loginAsTestUser(page);
+  });
+
   test("apply updates URL with q and status", async ({ page }) => {
     await page.goto("/projects");
     await expect(page.getByRole("heading", { name: "Projects" })).toBeVisible();

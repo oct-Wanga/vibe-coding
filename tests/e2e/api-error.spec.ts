@@ -1,8 +1,11 @@
 import { expect, test } from "@playwright/test";
+import { loginAsTestUser } from "./utils/auth";
 
 test.describe("API error reporting", () => {
-  test("returns an error id when JSON is invalid", async ({ request }) => {
-    const response = await request.post("/api/projects", {
+  test("returns an error id when JSON is invalid", async ({ page }) => {
+    await loginAsTestUser(page);
+
+    const response = await page.request.post("/api/projects", {
       data: "{",
       headers: { "Content-Type": "application/json" },
     });
