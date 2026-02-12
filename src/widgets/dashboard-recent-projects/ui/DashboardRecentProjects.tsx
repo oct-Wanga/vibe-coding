@@ -21,7 +21,9 @@ export function DashboardRecentProjects() {
         <CardTitle>Recent Projects</CardTitle>
       </CardHeader>
       <CardContent>
-        {projectsQuery.isLoading ? <div className="text-sm text-muted-foreground">Loading...</div> : null}
+        {projectsQuery.isLoading ? (
+          <div className="text-sm text-muted-foreground">Loading...</div>
+        ) : null}
         {projectsQuery.isError ? <div className="text-sm text-red-600">Failed to load</div> : null}
         {!projectsQuery.isLoading && recent.length === 0 ? (
           <EmptyState

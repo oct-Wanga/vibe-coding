@@ -13,7 +13,9 @@ export function DashboardTeamSummary() {
         <CardTitle>Team</CardTitle>
       </CardHeader>
       <CardContent>
-        {teamQuery.isLoading ? <div className="text-sm text-muted-foreground">Loading...</div> : null}
+        {teamQuery.isLoading ? (
+          <div className="text-sm text-muted-foreground">Loading...</div>
+        ) : null}
         {teamQuery.isError ? <div className="text-sm text-red-600">Failed to load</div> : null}
         {!teamQuery.isLoading && members.length === 0 ? (
           <EmptyState title="No team members." description="Invite teammates to get started." />

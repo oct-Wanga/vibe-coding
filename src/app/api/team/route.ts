@@ -57,7 +57,10 @@ export async function GET(req: NextRequest) {
       route,
       status: 401,
     });
-    return withRequestId(NextResponse.json({ message: "Unauthorized" }, { status: 401 }), requestId);
+    return withRequestId(
+      NextResponse.json({ message: "Unauthorized" }, { status: 401 }),
+      requestId,
+    );
   }
 
   const { data, error } = await supabase.from("profiles").select("*");

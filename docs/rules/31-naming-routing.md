@@ -16,4 +16,3 @@ globs:
 테스트의 page.goto는 baseUrl 포함 금지(경로만). (자세한 건 70-testing.md)
 
 ---
-

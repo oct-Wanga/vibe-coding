@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { UserAvatar, useMe } from "@/entities/user";
+import { useMe, UserAvatar } from "@/entities/user";
 import { routes } from "@/shared/config/routes";
 
 export function AppHeader() {
