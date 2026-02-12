@@ -1,3 +1,5 @@
+"use client";
+
 import { getUserDisplayName, UserAvatar, useTeamMembers } from "@/entities/user";
 import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState } from "@/shared/ui";
 

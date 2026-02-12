@@ -33,7 +33,8 @@ function normalizeActivity(raw: UnknownRecord): Activity | null {
 
   const type = normalizeType(raw.type);
   const message = getString(raw.message) ?? "Activity update.";
-  const createdAt = getString(raw.created_at) ?? getString(raw.createdAt) ?? new Date().toISOString();
+  const createdAt =
+    getString(raw.created_at) ?? getString(raw.createdAt) ?? new Date().toISOString();
   const actor = isRecord(raw.actor) ? normalizeActor(raw.actor) : undefined;
 
   return {
@@ -69,7 +70,10 @@ export async function GET(req: NextRequest) {
       route,
       status: 401,
     });
-    return withRequestId(NextResponse.json({ message: "Unauthorized" }, { status: 401 }), requestId);
+    return withRequestId(
+      NextResponse.json({ message: "Unauthorized" }, { status: 401 }),
+      requestId,
+    );
   }
 
   const { data, error } = await supabase

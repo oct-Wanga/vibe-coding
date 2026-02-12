@@ -1,3 +1,5 @@
+"use client";
+
 import type { ActivityType } from "@/entities/activity";
 import { useActivities } from "@/entities/activity";
 import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState } from "@/shared/ui";
