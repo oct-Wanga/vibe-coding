@@ -32,6 +32,24 @@ docker compose up --build
 
 ---
 
+
+## 1-2) FastAPI 백엔드 실행
+
+이제 `/api/*`는 Next Route Handler가 **FastAPI(8000)** 로 프록시합니다.
+
+```bash
+# 백엔드
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+
+# 프론트엔드(루트)
+FASTAPI_BASE_URL=http://localhost:8000 npm run dev
+```
+
+- FastAPI 기본 URL: `http://localhost:8000`
+- Next API 프록시 URL: `http://localhost:3000/api/*`
+
 ## 2) Scripts
 
 ```bash
