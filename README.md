@@ -28,7 +28,16 @@ npm run dev
 docker compose up --build
 ```
 
-- http://localhost:3000
+- Frontend: http://localhost:3000
+- FastAPI Docs: http://localhost:8000/docs
+- RedisInsight Dashboard: http://localhost:5540
+
+RedisInsight에서 Redis 연결 시 아래 값을 사용합니다.
+
+- Host: `redis` (또는 `localhost`)
+- Port: `6379`
+- DB: `0`
+- Username/Password: 없음
 
 ---
 
