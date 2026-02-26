@@ -5,6 +5,7 @@ import { logError, logWarn, REQUEST_ID_HEADER, resolveRequestId } from "@/shared
 import {
   createSupabaseServerClient,
   hasSupabaseEnv,
+  insertActivityLog,
   shouldUseMockProjects,
 } from "@/shared/supabase";
 
@@ -149,6 +150,20 @@ export async function POST(req: NextRequest) {
       status: 400,
     });
     return withRequestId(NextResponse.json({ message: error.message }, { status: 400 }), requestId);
+  }
+
+  const { error: activityLogError } = await insertActivityLog(supabase, {
+    type: "project.create",
+    message: `Project created: ${body.id}`,
+    actor: claims.claims.sub,
+  });
+  if (activityLogError) {
+    logWarn("activity_log_insert_failed", {
+      requestId,
+      route,
+      status: 201,
+      type: "project.create",
+    });
   }
 
   return withRequestId(NextResponse.json({ ok: true }, { status: 201 }), requestId);
