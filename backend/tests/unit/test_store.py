@@ -1,3 +1,4 @@
+from app.services.session_store import InMemorySessionStore
 from app.services.store import InMemoryStore
 
 
@@ -17,3 +18,25 @@ def test_store_project_crud() -> None:
     assert project.status == "archived"
 
     assert store.delete_project("p-1") is True
+
+
+def test_signup_hashes_password_and_verify_login() -> None:
+    store = InMemoryStore()
+
+    user_id, created = store.signup("demo@example.com", "secret123")
+
+    assert created is True
+    saved_user = store.users["demo@example.com"]
+    assert saved_user["password_hash"] != "secret123"
+    assert store.verify_login("demo@example.com", "secret123") == user_id
+    assert store.verify_login("demo@example.com", "wrong") is None
+
+
+def test_inmemory_session_store_create_resolve_delete() -> None:
+    session_store = InMemorySessionStore()
+
+    token = session_store.create("user-1")
+    assert session_store.resolve(token) == {"sub": "user-1"}
+
+    session_store.delete(token)
+    assert session_store.resolve(token) is None
