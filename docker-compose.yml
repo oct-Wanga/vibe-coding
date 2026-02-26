@@ -20,6 +20,15 @@ services:
     depends_on:
       - redis
 
+  redisinsight:
+    image: redis/redisinsight:latest
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
+    volumes:
+      - redisinsight:/data
+
   web:
     build:
       context: .
@@ -33,3 +42,6 @@ services:
       FASTAPI_BASE_URL: http://api:8000
     depends_on:
       - api
+
+volumes:
+  redisinsight:
