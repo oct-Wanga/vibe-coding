@@ -1,23 +1,7 @@
-import { headers } from "next/headers";
-import { NextResponse } from "next/server";
+import { type NextRequest } from "next/server";
 
-import {
-  createHealthLogContext,
-  createHealthPayload,
-  getRuntimeEnvironment,
-  logInfo,
-  REQUEST_ID_HEADER,
-  resolveRequestId,
-} from "@/shared/lib/monitoring";
+import { proxyToFastApi } from "@/shared/lib/fastapiProxy";
 
-export async function GET() {
-  const requestHeaders = await headers();
-  const requestId = resolveRequestId(requestHeaders, () => crypto.randomUUID());
-  const payload = createHealthPayload(new Date(), getRuntimeEnvironment(), requestId);
-  logInfo("health_check", createHealthLogContext(payload));
-
-  const response = NextResponse.json(payload);
-  response.headers.set(REQUEST_ID_HEADER, requestId);
-
-  return response;
+export async function GET(request: NextRequest) {
+  return proxyToFastApi(request, "/api/health");
 }
