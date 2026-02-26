@@ -17,6 +17,7 @@ globs:
   - `entities/<entity>/api/use*.ts`
 
 Provider:
+
 - QueryClientProvider는 단일 진입점(권장: `src/app/providers.tsx`)에 1회만 둔다.
 
 ---

@@ -18,6 +18,7 @@ globs:
 app → views → widgets → features → entities → shared
 
 금지:
+
 - 하위 레이어가 상위 레이어 import
 - shared/entities가 features/widgets/views/app import
 - features가 views/app import
@@ -28,16 +29,18 @@ app → views → widgets → features → entities → shared
 
 다음 레이어는 **반드시 각 모듈의 `index.ts`만 통해서 import**:
 
-- views/*
-- widgets/*
-- features/*
-- entities/*
+- views/\*
+- widgets/\*
+- features/\*
+- entities/\*
 
 금지(딥 임포트):
+
 - `@/features/x/ui/...`
 - `@/entities/y/model/...`
 
 허용:
+
 - `@/features/x`
 - `@/entities/y`
 

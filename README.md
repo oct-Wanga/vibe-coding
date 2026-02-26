@@ -32,7 +32,6 @@ docker compose up --build
 
 ---
 
-
 ## 1-2) FastAPI 백엔드 실행
 
 이제 `/api/*`는 Next Route Handler가 **FastAPI(8000)** 로 프록시합니다.

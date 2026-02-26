@@ -15,6 +15,7 @@ Cursor는 딥 임포트를 만들지 말고, 필요한 export는 index.ts로 승
 ## 1) 딥 임포트 금지(재강조)
 
 금지:
+
 - `@/features/*/ui/*`
 - `@/features/*/model/*`
 - `@/entities/*/model/*`
@@ -22,6 +23,7 @@ Cursor는 딥 임포트를 만들지 말고, 필요한 export는 index.ts로 승
 - `@/views/*/*`
 
 허용:
+
 - `@/features/<feature>`
 - `@/entities/<entity>`
 - `@/widgets/<widget>`
@@ -40,12 +42,14 @@ Cursor는 딥 임포트를 만들지 말고, 필요한 export는 index.ts로 승
 ## 3) export 범위 가이드
 
 features/<feature>/index.ts 허용:
+
 - Feature Entry UI(루트 컴포넌트)
 - 공개 hook(useXxx)
 - queryKey factory, public types
 - 외부 공유 필요한 계약 스키마
 
 금지:
+
 - private helper, 내부 전용 types
 - ui 세부 조각을 대량 노출(필요하면 widget 승격 검토)
 

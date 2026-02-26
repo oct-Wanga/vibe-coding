@@ -22,7 +22,7 @@ Cursor는 코드 생성/수정 시 아래 스택을 기본값으로 따른다.
 
 - Tailwind CSS 기반
 - UI 컴포넌트는 프로젝트 표준(shadcn/ui 등)이 있으면 그걸 우선
-금지(프로젝트 표준과 충돌 시):
+  금지(프로젝트 표준과 충돌 시):
 - styled-components / emotion (팀 표준이 Tailwind라면)
 
 ---
@@ -31,7 +31,7 @@ Cursor는 코드 생성/수정 시 아래 스택을 기본값으로 따른다.
 
 - Server State: React Query(@tanstack/react-query) 또는 RSC(Server) 패칭
 - Global UI State: Zustand(선호) — 단, 서버 데이터 저장 금지
-금지(팀 표준이 아니라면):
+  금지(팀 표준이 아니라면):
 - Redux/MobX/Recoil/SWR
 
 ---
