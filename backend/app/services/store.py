@@ -1,22 +1,26 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import TypedDict
 from uuid import uuid4
 
+from passlib.context import CryptContext
+
 from app.models.schemas import Project, ProjectStatus
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class User(TypedDict):
     id: str
     email: str
-    password: str
+    password_hash: str
 
 
 class InMemoryStore:
     def __init__(self) -> None:
-        now = datetime.now(UTC)
+        now = datetime.now(timezone.utc)
         self.projects: dict[str, Project] = {
             "sample-1": Project(
                 id="sample-1",
@@ -27,7 +31,6 @@ class InMemoryStore:
             )
         }
         self.users: dict[str, User] = {}
-        self.sessions: dict[str, str] = {}
 
     def list_projects(self, q: str | None, status: ProjectStatus | None) -> list[Project]:
         items = list(self.projects.values())
@@ -43,7 +46,7 @@ class InMemoryStore:
         return deepcopy(project) if project else None
 
     def create_project(self, project_id: str, name: str) -> Project:
-        now = datetime.now(UTC)
+        now = datetime.now(timezone.utc)
         project = Project(
             id=project_id,
             name=name,
@@ -67,7 +70,7 @@ class InMemoryStore:
             update={
                 "name": name if name is not None else existing.name,
                 "status": status if status is not None else existing.status,
-                "updated_at": datetime.now(UTC),
+                "updated_at": datetime.now(timezone.utc),
             }
         )
         self.projects[project_id] = updated
@@ -80,27 +83,18 @@ class InMemoryStore:
         if email in self.users:
             return self.users[email]["id"], False
         user_id = str(uuid4())
-        self.users[email] = {"id": user_id, "email": email, "password": password}
+        self.users[email] = {
+            "id": user_id,
+            "email": email,
+            "password_hash": pwd_context.hash(password),
+        }
         return user_id, True
 
-    def login(self, email: str, password: str) -> str | None:
+    def verify_login(self, email: str, password: str) -> str | None:
         user = self.users.get(email)
-        if not user or user["password"] != password:
+        if not user or not pwd_context.verify(password, user["password_hash"]):
             return None
-        token = str(uuid4())
-        self.sessions[token] = user["id"]
-        return token
-
-    def logout(self, token: str) -> None:
-        self.sessions.pop(token, None)
-
-    def resolve_user(self, token: str | None) -> dict[str, str] | None:
-        if not token:
-            return None
-        user_id = self.sessions.get(token)
-        if not user_id:
-            return None
-        return {"sub": user_id}
+        return user["id"]
 
 
 store = InMemoryStore()
