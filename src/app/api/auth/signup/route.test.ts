@@ -1,100 +1,51 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const signUp = vi.fn();
+const proxyToFastApi = vi.fn();
+const localPost = vi.fn();
 
-vi.mock("@/shared/supabase", () => {
-  return {
-    createSupabaseServerClient: vi.fn(async () => ({
-      auth: {
-        signUp,
-      },
-    })),
-  };
-});
+vi.mock("@/shared/lib/fastapiProxy", () => ({
+  proxyToFastApi,
+}));
+
+vi.mock("./route.local", () => ({
+  POST: localPost,
+}));
 
 describe("/api/auth/signup POST", () => {
-  it("returns 400 when email/password missing", async () => {
-    const { POST } = await import("./route");
-
-    const req = new Request("http://localhost/api/auth/signup", {
-      method: "POST",
-      body: JSON.stringify({ email: "   ", password: "" }),
-      headers: { "Content-Type": "application/json" },
-    }) as unknown as Parameters<typeof POST>[0];
-
-    const res = await POST(req);
-    expect(res.status).toBe(400);
-    expect(res.headers.get("x-request-id")).toBeTruthy();
-
-    const json = (await res.json()) as { message?: string };
-    expect(json.message).toBe("email/password required");
+  beforeEach(() => {
+    vi.resetModules();
+    vi.clearAllMocks();
+    delete process.env.API_BACKEND;
   });
 
-  it("returns 400 with supabase error message", async () => {
-    const { POST } = await import("./route");
-    signUp.mockResolvedValueOnce({ data: null, error: { message: "User already registered" } });
+  it("API_BACKEND=fastapi면 FastAPI로 프록시한다", async () => {
+    process.env.API_BACKEND = "fastapi";
+    proxyToFastApi.mockResolvedValueOnce(
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    );
 
+    const { POST } = await import("./route");
     const req = new Request("http://localhost/api/auth/signup", {
       method: "POST",
-      body: JSON.stringify({ email: "a@b.com", password: "12345678" }),
-      headers: { "Content-Type": "application/json" },
     }) as unknown as Parameters<typeof POST>[0];
 
-    const res = await POST(req);
-    expect(res.status).toBe(400);
-    expect(res.headers.get("x-request-id")).toBeTruthy();
+    await POST(req);
 
-    const json = (await res.json()) as { message?: string };
-    expect(json.message).toBe("User already registered");
+    expect(proxyToFastApi).toHaveBeenCalledWith(req, "/api/auth/signup");
+    expect(localPost).not.toHaveBeenCalled();
   });
 
-  it("returns ok with needsEmailConfirm=true when session is null", async () => {
-    const { POST } = await import("./route");
-    signUp.mockResolvedValueOnce({
-      data: { user: { id: "u1" }, session: null },
-      error: null,
-    });
+  it("기본값(route)이면 기존 Route Handler를 사용한다", async () => {
+    localPost.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
 
+    const { POST } = await import("./route");
     const req = new Request("http://localhost/api/auth/signup", {
       method: "POST",
-      body: JSON.stringify({ email: "a@b.com", password: "12345678" }),
-      headers: { "Content-Type": "application/json" },
     }) as unknown as Parameters<typeof POST>[0];
 
-    const res = await POST(req);
-    expect(res.status).toBe(200);
-    expect(res.headers.get("x-request-id")).toBeTruthy();
+    await POST(req);
 
-    const json = (await res.json()) as {
-      ok?: boolean;
-      userId?: string | null;
-      needsEmailConfirm?: boolean;
-    };
-
-    expect(json.ok).toBe(true);
-    expect(json.userId).toBe("u1");
-    expect(json.needsEmailConfirm).toBe(true);
-  });
-
-  it("returns ok with needsEmailConfirm=false when session exists", async () => {
-    const { POST } = await import("./route");
-    signUp.mockResolvedValueOnce({
-      data: { user: { id: "u2" }, session: { access_token: "t" } },
-      error: null,
-    });
-
-    const req = new Request("http://localhost/api/auth/signup", {
-      method: "POST",
-      body: JSON.stringify({ email: "a@b.com", password: "12345678" }),
-      headers: { "Content-Type": "application/json" },
-    }) as unknown as Parameters<typeof POST>[0];
-
-    const res = await POST(req);
-    expect(res.status).toBe(200);
-    expect(res.headers.get("x-request-id")).toBeTruthy();
-
-    const json = (await res.json()) as { needsEmailConfirm?: boolean; userId?: string | null };
-    expect(json.userId).toBe("u2");
-    expect(json.needsEmailConfirm).toBe(false);
+    expect(localPost).toHaveBeenCalledWith(req);
+    expect(proxyToFastApi).not.toHaveBeenCalled();
   });
 });
