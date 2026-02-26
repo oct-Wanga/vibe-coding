@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { logWarn, REQUEST_ID_HEADER, resolveRequestId } from "@/shared/lib/monitoring";
-import { createSupabaseServerClient } from "@/shared/supabase";
+import { createSupabaseServerClient, insertActivityLog } from "@/shared/supabase";
 
 export async function POST(req: NextRequest) {
   const requestId = resolveRequestId(req.headers, () => crypto.randomUUID());
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     return response;
   }
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email: body.email,
     password: body.password,
   });
@@ -34,6 +34,20 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json({ message: error.message }, { status: 401 });
     response.headers.set(REQUEST_ID_HEADER, requestId);
     return response;
+  }
+
+  const { error: activityLogError } = await insertActivityLog(supabase, {
+    type: "auth.login",
+    message: "User logged in",
+    actor: data.user?.id ?? body.email,
+  });
+  if (activityLogError) {
+    logWarn("activity_log_insert_failed", {
+      requestId,
+      route,
+      status: 200,
+      type: "auth.login",
+    });
   }
 
   const response = NextResponse.json({ ok: true });
