@@ -13,9 +13,11 @@ globs:
 작업이 모두 끝나면 **Conventional Commits** 형식으로 커밋 메시지를 작성한다.
 
 형식:
+
 - `type(scope): subject`
 
 권장 type:
+
 - feat, fix, refactor, chore, docs, test, ci
 
 ---
@@ -26,6 +28,7 @@ globs:
 - scope는 필요할 때만(기능/모듈 단위).
 
 예:
+
 - `feat(auth): 로그인 폼 추가`
 - `fix(project): 프로젝트 상세 조회 오류 수정`
 - `test(e2e): 결제 플로우 시나리오 추가`

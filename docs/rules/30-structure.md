@@ -22,23 +22,26 @@ globs:
 ## 2) 모듈 내부 템플릿(권장)
 
 features/<feature>/:
+
 - ui/ api/ actions/ model/ schemas/ index.ts
 
 entities/<entity>/:
+
 - model/ ui/ api/ index.ts
 
 shared/:
+
 - ui/ lib/ hooks/ stores/ config/ types 등
 
 ---
 
 ## 3) 위치 결정 트리
 
-1) feature 한정 → features  
-2) 도메인 공유 → entities  
-3) 범용 공용 → shared  
-4) 조립 블록 → widgets  
-5) 라우트 종속 조립 → views  
-6) 라우팅 경계 → app
+1. feature 한정 → features
+2. 도메인 공유 → entities
+3. 범용 공용 → shared
+4. 조립 블록 → widgets
+5. 라우트 종속 조립 → views
+6. 라우팅 경계 → app
 
 ---
