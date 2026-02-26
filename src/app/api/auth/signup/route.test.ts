@@ -1,34 +1,51 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const proxyToFastApi = vi.fn();
+const localPost = vi.fn();
+
+vi.mock("@/shared/lib/fastapiProxy", () => ({
+  proxyToFastApi,
+}));
+
+vi.mock("./route.local", () => ({
+  POST: localPost,
+}));
 
 describe("/api/auth/signup POST", () => {
-  it("fastapi 회원가입 엔드포인트로 프록시한다", async () => {
-    const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ ok: true, userId: "u1", needsEmailConfirm: false }), {
-        status: 200,
-        headers: {
-          "content-type": "application/json",
-          "x-request-id": "req-2",
-        },
-      }),
-    );
+  beforeEach(() => {
+    vi.resetModules();
+    vi.clearAllMocks();
+    delete process.env.API_BACKEND;
+  });
 
-    vi.stubGlobal("fetch", fetchMock);
+  it("API_BACKEND=fastapi면 FastAPI로 프록시한다", async () => {
+    process.env.API_BACKEND = "fastapi";
+    proxyToFastApi.mockResolvedValueOnce(
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    );
 
     const { POST } = await import("./route");
     const req = new Request("http://localhost/api/auth/signup", {
       method: "POST",
-      body: JSON.stringify({ email: "a@b.com", password: "12345678" }),
-      headers: { "Content-Type": "application/json" },
     }) as unknown as Parameters<typeof POST>[0];
 
-    const res = await POST(req);
+    await POST(req);
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      "http://localhost:8000/api/auth/signup",
-      expect.any(Object),
-    );
-    expect(res.status).toBe(200);
-    expect(res.headers.get("x-request-id")).toBe("req-2");
-    expect(await res.json()).toEqual({ ok: true, userId: "u1", needsEmailConfirm: false });
+    expect(proxyToFastApi).toHaveBeenCalledWith(req, "/api/auth/signup");
+    expect(localPost).not.toHaveBeenCalled();
+  });
+
+  it("기본값(route)이면 기존 Route Handler를 사용한다", async () => {
+    localPost.mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+
+    const { POST } = await import("./route");
+    const req = new Request("http://localhost/api/auth/signup", {
+      method: "POST",
+    }) as unknown as Parameters<typeof POST>[0];
+
+    await POST(req);
+
+    expect(localPost).toHaveBeenCalledWith(req);
+    expect(proxyToFastApi).not.toHaveBeenCalled();
   });
 });

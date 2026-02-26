@@ -44,9 +44,11 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 
 # 프론트엔드(루트)
-FASTAPI_BASE_URL=http://localhost:8000 npm run dev
+API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run dev
 ```
 
+- `API_BACKEND=route`(기본): 기존 Next Route Handler 사용
+- `API_BACKEND=fastapi`: Next Route Handler가 FastAPI로 프록시
 - FastAPI 기본 URL: `http://localhost:8000`
 - Next API 프록시 URL: `http://localhost:3000/api/*`
 
