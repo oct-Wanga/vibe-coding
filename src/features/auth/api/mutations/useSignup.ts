@@ -19,11 +19,12 @@ async function signupRequest(input: SignupInput): Promise<SignupResponse> {
   const data = (await res.json().catch(() => ({}))) as Partial<{
     ok: boolean;
     message: string;
+    detail: string;
     userId: string | null;
     needsEmailConfirm: boolean;
   }>;
 
-  if (!res.ok) return { ok: false, message: data.message ?? "HTTP error" };
+  if (!res.ok) return { ok: false, message: data.message ?? data.detail ?? "HTTP error" };
 
   return {
     ok: true,
