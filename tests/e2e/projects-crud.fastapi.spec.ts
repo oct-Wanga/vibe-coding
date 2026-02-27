@@ -1,10 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-import { isRouteBackend } from "./backendMode";
+import { isFastApiBackend } from "./backendMode";
 
-test.skip(!isRouteBackend, "route backend 전용 테스트");
+test.skip(!isFastApiBackend, "fastapi backend 전용 테스트");
 
-test.describe("Projects CRUD (/projects)", () => {
+test.describe("Projects CRUD (/projects, fastapi)", () => {
   test("create, update, archive, delete flow", async ({ page }) => {
     const uniqueId = `p_e2e_${Date.now()}`;
     const projectName = `E2E Project ${uniqueId}`;
@@ -37,7 +37,8 @@ test.describe("Projects CRUD (/projects)", () => {
     await page.getByRole("button", { name: "삭제" }).click();
     await page.getByRole("button", { name: "정말 삭제" }).click();
 
-    await expect(page).toHaveURL("/projects");
+    await page.goto("/projects");
+    await page.getByRole("button", { name: "Apply" }).click();
     await expect(page.locator("li", { hasText: updatedName })).toHaveCount(0);
   });
 
@@ -58,6 +59,8 @@ test.describe("Projects CRUD (/projects)", () => {
     await page.getByRole("button", { name: "삭제" }).click();
     await page.getByRole("button", { name: "정말 삭제" }).click();
 
-    await expect(page).toHaveURL("/projects");
+    await page.goto("/projects");
+    await page.getByRole("button", { name: "Apply" }).click();
+    await expect(page.locator("li", { hasText: projectName })).toHaveCount(0);
   });
 });

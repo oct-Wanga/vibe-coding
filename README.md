@@ -117,7 +117,43 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 
 ---
 
-## 2-2) 관측/모니터링
+## 2-2) E2E 백엔드 모드 분리
+
+E2E 테스트는 `API_BACKEND` 값에 따라 `route` 전용/`fastapi` 전용 케이스로 분리되어 있습니다.
+
+- `API_BACKEND=route`: `*.spec.ts`(route 전용) 실행, `*.fastapi.spec.ts`는 skip
+- `API_BACKEND=fastapi`: `*.fastapi.spec.ts` 실행, route 전용은 skip
+
+### Route 모드 실행
+
+```powershell
+$env:API_BACKEND="route"
+npm run test:e2e
+```
+
+```bash
+API_BACKEND=route npm run test:e2e
+```
+
+### FastAPI 모드 실행
+
+FastAPI 서버(`http://localhost:8000`)가 먼저 떠 있어야 합니다.
+
+```powershell
+docker compose up -d redis api
+$env:API_BACKEND="fastapi"
+$env:FASTAPI_BASE_URL="http://localhost:8000"
+npm run test:e2e
+```
+
+```bash
+docker compose up -d redis api
+API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run test:e2e
+```
+
+---
+
+## 2-3) 관측/모니터링
 
 ### Health Check
 

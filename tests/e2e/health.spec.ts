@@ -1,5 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+import { isRouteBackend } from "./backendMode";
+
+test.skip(!isRouteBackend, "route backend 전용 테스트");
+
 test.describe("Health check (/api/health)", () => {
   test("returns ok status", async ({ request }) => {
     const response = await request.get("/api/health");

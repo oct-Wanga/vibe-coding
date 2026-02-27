@@ -1,5 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+import { isRouteBackend } from "./backendMode";
+
+test.skip(!isRouteBackend, "route backend 전용 테스트");
+
 test("health API는 정상 응답을 반환한다", async ({ request }) => {
   const response = await request.get("/api/health");
   expect(response.ok()).toBeTruthy();
