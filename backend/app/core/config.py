@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     session_cookie_secure: bool = False
     session_cookie_httponly: bool = True
     session_cookie_samesite: str = "lax"
+    session_single_login: bool = True
+    login_rate_limit_max_attempts: int = 5
+    login_rate_limit_window_seconds: int = 60
 
     supabase_url: str | None = None
     supabase_service_role_key: str | None = None

@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
 from redis.exceptions import RedisError
 
 from app.api.deps import get_request_id
 from app.core.config import settings
 from app.models.schemas import LoginBody, SignupBody
 from app.services.activity_logs import insert_activity_log
+from app.services.login_rate_limiter import login_rate_limiter
 from app.services.session_store import session_store
+from app.services.session_store import DuplicateSessionError
 from app.services.store import store
 from app.services.supabase_auth import has_supabase_auth_config, login_user, signup_user
 from app.services.user_profile_sync import upsert_signup_profile
@@ -30,19 +32,34 @@ def signup(body: SignupBody, response: Response, request_id: str = Depends(get_r
 
 
 @router.post("/login")
-def login(body: LoginBody, response: Response, request_id: str = Depends(get_request_id)) -> dict[str, bool]:
+def login(
+    body: LoginBody,
+    request: Request,
+    response: Response,
+    request_id: str = Depends(get_request_id),
+) -> dict[str, bool]:
     response.headers["x-request-id"] = request_id
+    client_ip = request.client.host if request.client else "unknown"
+    limit_key = f"{client_ip}:{body.email.lower()}"
+    if login_rate_limiter.is_limited(limit_key):
+        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="로그인 시도 횟수 초과")
+
     if has_supabase_auth_config():
         user_id, error = login_user(body.email, body.password)
         if error or not user_id:
+            login_rate_limiter.add_failure(limit_key)
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=error or "로그인 실패")
     else:
         user_id = store.verify_login(body.email, body.password)
         if not user_id:
+            login_rate_limiter.add_failure(limit_key)
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="로그인 실패")
+    login_rate_limiter.reset(limit_key)
 
     try:
         token = session_store.create(user_id)
+    except DuplicateSessionError:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="이미 로그인된 사용자입니다")
     except RedisError as exc:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="세션 저장소 오류") from exc
 
