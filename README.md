@@ -93,6 +93,8 @@ npm run format:fix
 npm run test            # unit (vitest)
 npm run test:e2e        # e2e (playwright)
 npm run test:e2e:ui
+npm run release:dry-run # 릴리즈 시뮬레이션
+npm run release         # semantic-release 실행
 ```
 
 > `next lint --fix`는 Next 16에서 동작이 달라질 수 있어 본 프로젝트는 **eslint를 직접 실행**합니다.
@@ -215,6 +217,38 @@ DSN 확인 위치:
 1. 개발 서버 실행 후, 클라이언트/서버에서 `Sentry.captureMessage` 또는 `Sentry.captureException`을 호출합니다.
 2. Sentry 대시보드의 Issues/Discover에서 이벤트 유입을 확인합니다.
 3. Replay 사용 시 Project → Replays에서 세션 기록을 확인합니다.
+
+---
+
+## 2-4) 버전/태그 자동화(semantic-release)
+
+이 프로젝트는 `main` 브랜치에서 GitLab CI가 `semantic-release`를 실행해 버전을 자동 산정합니다.
+
+- 자동 생성: Git tag (`vX.Y.Z`), Release notes
+- 버전 계산 기준: Conventional Commits
+  - `feat:` -> minor
+  - `fix:` -> patch
+  - `BREAKING CHANGE` 또는 `type!:` -> major
+
+### CI 설정
+
+- 파일: `.gitlab-ci.yml`
+- 설정: `.releaserc.json`
+- 실행 브랜치: `main`
+
+### 필수 토큰
+
+GitLab 프로젝트/그룹 CI 변수에 아래를 추가합니다.
+
+- `GITLAB_TOKEN` (또는 `GL_TOKEN`)
+  - 권한: 최소 `api`, `write_repository`
+  - 보호 브랜치(`main`)에 push/tag 가능한 계정 토큰 권장
+
+### 로컬 점검
+
+```bash
+npm run release:dry-run
+```
 
 ---
 
