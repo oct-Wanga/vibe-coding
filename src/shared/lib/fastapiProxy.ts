@@ -23,12 +23,25 @@ export async function proxyToFastApi(
   const method = request.method;
   const headers = buildHeaders(request);
   const body = method === "GET" || method === "DELETE" ? undefined : await request.text();
-  const upstreamResponse = await fetch(`${FASTAPI_BASE_URL}${targetPath}`, {
-    method,
-    headers,
-    body,
-    cache: "no-store",
-  });
+  let upstreamResponse: Response;
+  try {
+    upstreamResponse = await fetch(`${FASTAPI_BASE_URL}${targetPath}`, {
+      method,
+      headers,
+      body,
+      cache: "no-store",
+    });
+  } catch {
+    const response = NextResponse.json(
+      { message: "FastAPI upstream unavailable" },
+      { status: 503 },
+    );
+    const requestId = request.headers.get(REQUEST_ID_HEADER);
+    if (requestId) {
+      response.headers.set(REQUEST_ID_HEADER, requestId);
+    }
+    return response;
+  }
 
   const text = await upstreamResponse.text();
   const response = new NextResponse(text, {
