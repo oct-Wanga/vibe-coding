@@ -34,8 +34,14 @@ test.describe("Projects CRUD (/projects, fastapi)", () => {
     await page.getByRole("button", { name: "보관" }).click();
     await expect(page.getByText("archived")).toBeVisible();
 
+    const deleteResponsePromise = page.waitForResponse(
+      (response) =>
+        response.request().method() === "DELETE" && response.url().includes(`/api/projects/${uniqueId}`),
+    );
     await page.getByRole("button", { name: "삭제" }).click();
     await page.getByRole("button", { name: "정말 삭제" }).click();
+    const deleteResponse = await deleteResponsePromise;
+    expect(deleteResponse.ok()).toBeTruthy();
 
     await page.goto("/projects");
     await page.getByRole("button", { name: "Apply" }).click();
@@ -56,8 +62,14 @@ test.describe("Projects CRUD (/projects, fastapi)", () => {
     await expect(listItem).toBeVisible();
 
     await listItem.getByRole("link", { name: "Open" }).click();
+    const deleteResponsePromise = page.waitForResponse(
+      (response) =>
+        response.request().method() === "DELETE" && response.url().includes(`/api/projects/${uniqueId}`),
+    );
     await page.getByRole("button", { name: "삭제" }).click();
     await page.getByRole("button", { name: "정말 삭제" }).click();
+    const deleteResponse = await deleteResponsePromise;
+    expect(deleteResponse.ok()).toBeTruthy();
 
     await page.goto("/projects");
     await page.getByRole("button", { name: "Apply" }).click();
