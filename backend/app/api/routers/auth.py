@@ -7,6 +7,8 @@ from app.models.schemas import LoginBody, SignupBody
 from app.services.activity_logs import insert_activity_log
 from app.services.session_store import session_store
 from app.services.store import store
+from app.services.supabase_auth import has_supabase_auth_config, login_user, signup_user
+from app.services.user_profile_sync import upsert_signup_profile
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -14,9 +16,15 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/signup")
 def signup(body: SignupBody, response: Response, request_id: str = Depends(get_request_id)) -> dict[str, object]:
     response.headers["x-request-id"] = request_id
-    user_id, created = store.signup(body.email, body.password)
-    if not created:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="이미 가입된 이메일입니다")
+    if has_supabase_auth_config():
+        user_id, error = signup_user(body.email, body.password)
+        if error or not user_id:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error or "회원가입 실패")
+    else:
+        user_id, created = store.signup(body.email, body.password)
+        if not created:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="이미 가입된 이메일입니다")
+    upsert_signup_profile(user_id=user_id, email=body.email)
     insert_activity_log("auth.signup", "User signed up", actor=user_id)
     return {"ok": True, "userId": user_id, "needsEmailConfirm": False}
 
@@ -24,9 +32,14 @@ def signup(body: SignupBody, response: Response, request_id: str = Depends(get_r
 @router.post("/login")
 def login(body: LoginBody, response: Response, request_id: str = Depends(get_request_id)) -> dict[str, bool]:
     response.headers["x-request-id"] = request_id
-    user_id = store.verify_login(body.email, body.password)
-    if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="로그인 실패")
+    if has_supabase_auth_config():
+        user_id, error = login_user(body.email, body.password)
+        if error or not user_id:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=error or "로그인 실패")
+    else:
+        user_id = store.verify_login(body.email, body.password)
+        if not user_id:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="로그인 실패")
 
     try:
         token = session_store.create(user_id)
