@@ -1,5 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+import { isRouteBackend } from "./backendMode";
+
+test.skip(!isRouteBackend, "route backend 전용 테스트");
+
 test.describe("API error reporting", () => {
   test("returns an error id when JSON is invalid", async ({ request }) => {
     const response = await request.post("/api/projects", {
