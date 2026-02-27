@@ -1,4 +1,6 @@
-from app.services.session_store import InMemorySessionStore
+import pytest
+
+from app.services.session_store import DuplicateSessionError, InMemorySessionStore
 from app.services.store import InMemoryStore
 
 
@@ -40,3 +42,11 @@ def test_inmemory_session_store_create_resolve_delete() -> None:
 
     session_store.delete(token)
     assert session_store.resolve(token) is None
+
+
+def test_inmemory_session_store_blocks_duplicate_login_when_enabled() -> None:
+    session_store = InMemorySessionStore(single_login=True)
+
+    session_store.create("user-1")
+    with pytest.raises(DuplicateSessionError):
+        session_store.create("user-1")
