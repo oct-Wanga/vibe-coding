@@ -14,6 +14,9 @@ export SUPABASE_SERVICE_ROLE_KEY=
 uvicorn app.main:app --reload --port 8000
 ```
 
+- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`가 설정되면 `signup/login`은 Supabase Auth를 사용합니다.
+- 미설정 시에는 기존 in-memory 사용자 저장소를 사용합니다.
+
 ## 테스트
 
 ```bash
