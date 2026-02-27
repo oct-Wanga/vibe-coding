@@ -9,7 +9,11 @@ RUN npm ci
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+ARG API_BACKEND=route
+ARG FASTAPI_BASE_URL=http://localhost:8000
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV API_BACKEND=$API_BACKEND
+ENV FASTAPI_BASE_URL=$FASTAPI_BASE_URL
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -21,6 +25,10 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ARG API_BACKEND=route
+ARG FASTAPI_BASE_URL=http://localhost:8000
+ENV API_BACKEND=$API_BACKEND
+ENV FASTAPI_BASE_URL=$FASTAPI_BASE_URL
 
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001

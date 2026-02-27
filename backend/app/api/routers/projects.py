@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from app.api.deps import get_request_id
 from app.models.schemas import Project, ProjectCreateBody, ProjectUpdateBody
+from app.services.activity_logs import insert_activity_log
 from app.services.store import store
 
 router = APIRouter(prefix="/projects", tags=["projects"])
@@ -23,7 +24,9 @@ def list_projects(
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=Project)
 def create_project(body: ProjectCreateBody, response: Response, request_id: str = Depends(get_request_id)) -> Project:
     response.headers["x-request-id"] = request_id
-    return store.create_project(project_id=body.id, name=body.name)
+    project = store.create_project(project_id=body.id, name=body.name)
+    insert_activity_log("project.create", f"Project created: {body.id}")
+    return project
 
 
 @router.get("/{project_id}", response_model=Project)
@@ -48,6 +51,7 @@ def patch_project(
     ok = store.update_project(project_id=project_id, name=body.name, status=body.status)
     if not ok:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    insert_activity_log("project.update", f"Project updated: {project_id}")
     return {"ok": True}
 
 
@@ -57,4 +61,5 @@ def delete_project(project_id: str, response: Response, request_id: str = Depend
     ok = store.delete_project(project_id)
     if not ok:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    insert_activity_log("project.delete", f"Project deleted: {project_id}")
     return {"ok": True}

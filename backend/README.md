@@ -9,6 +9,8 @@ source .venv/bin/activate
 pip install -r requirements.txt
 export SESSION_STORE_BACKEND=redis
 export REDIS_URL=redis://localhost:6379/0
+export SUPABASE_URL=
+export SUPABASE_SERVICE_ROLE_KEY=
 uvicorn app.main:app --reload --port 8000
 ```
 
