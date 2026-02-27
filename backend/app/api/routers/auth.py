@@ -4,6 +4,7 @@ from redis.exceptions import RedisError
 from app.api.deps import get_request_id
 from app.core.config import settings
 from app.models.schemas import LoginBody, SignupBody
+from app.services.activity_logs import insert_activity_log
 from app.services.session_store import session_store
 from app.services.store import store
 
@@ -16,6 +17,7 @@ def signup(body: SignupBody, response: Response, request_id: str = Depends(get_r
     user_id, created = store.signup(body.email, body.password)
     if not created:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="이미 가입된 이메일입니다")
+    insert_activity_log("auth.signup", "User signed up", actor=user_id)
     return {"ok": True, "userId": user_id, "needsEmailConfirm": False}
 
 
@@ -38,6 +40,7 @@ def login(body: LoginBody, response: Response, request_id: str = Depends(get_req
         httponly=settings.session_cookie_httponly,
         samesite=settings.session_cookie_samesite,
     )
+    insert_activity_log("auth.login", "User logged in", actor=user_id)
     return {"ok": True}
 
 
@@ -48,11 +51,18 @@ def logout(
     session_token: str | None = Cookie(default=None, alias=settings.session_cookie_name),
 ) -> dict[str, bool]:
     response.headers["x-request-id"] = request_id
+    actor: str | None = None
+    try:
+        user = session_store.resolve(session_token)
+        actor = user["sub"] if user else None
+    except RedisError:
+        actor = None
     try:
         session_store.delete(session_token)
     except RedisError as exc:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="세션 저장소 오류") from exc
     response.delete_cookie(settings.session_cookie_name)
+    insert_activity_log("auth.logout", "User logged out", actor=actor)
     return {"ok": True}
 
 

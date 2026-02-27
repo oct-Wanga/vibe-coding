@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     session_cookie_httponly: bool = True
     session_cookie_samesite: str = "lax"
 
+    supabase_url: str | None = None
+    supabase_service_role_key: str | None = None
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

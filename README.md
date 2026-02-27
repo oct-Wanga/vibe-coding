@@ -59,6 +59,8 @@ API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run dev
 - `API_BACKEND=fastapi`: Next Route Handler가 FastAPI로 프록시
 - FastAPI 기본 URL: `http://localhost:8000`
 - Next API 프록시 URL: `http://localhost:3000/api/*`
+- FastAPI에서 `activity_logs`를 Supabase에 기록하려면 아래 환경 변수를 추가로 설정:
+  - `SUPABASE_SERVICE_ROLE_KEY=`
 
 ## 2) Scripts
 
