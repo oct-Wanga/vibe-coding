@@ -49,10 +49,19 @@ RedisInsight에서 Redis 연결 시 아래 값을 사용합니다.
 # 백엔드
 cd backend
 pip install -r requirements.txt
+# Redis가 없으면 세션 저장소를 memory로 지정
+# export SESSION_STORE_BACKEND=memory
 uvicorn app.main:app --reload --port 8000
 
-# 프론트엔드(루트)
+# 프론트엔드(루트, macOS/Linux)
 API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run dev
+```
+
+```powershell
+# 프론트엔드(루트, PowerShell)
+$env:API_BACKEND="fastapi"
+$env:FASTAPI_BASE_URL="http://localhost:8000"
+npm run dev
 ```
 
 - `API_BACKEND=route`(기본): 기존 Next Route Handler 사용
@@ -96,12 +105,14 @@ Supabase 연동을 사용하려면 아래 환경 변수가 필요합니다.
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY= # 또는 NEXT_PUBLIC_SUPABASE_ANON_KEY
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+# 또는
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
 환경 변수가 없으면 `/api/projects` 관련 엔드포인트는 **mock 데이터**를 사용합니다.
 
-- mock 데이터는 `entities/project/model/mock.ts` 기준
+- mock 데이터는 `src/entities/project/model/mock.ts` 기준
 - `POST/PATCH/DELETE`는 성공 응답만 반환하고 **영구 저장은 하지 않습니다**
 
 ---
@@ -245,8 +256,8 @@ src/
   entities/               # 도메인 엔티티 단위
     project/
       model/              # 타입/상수/키/순수 로직
-      api/                # 엔티티 관련 fetcher
-      hooks/              # React Query hooks
+      api/queries/        # 엔티티 관련 fetcher + React Query hooks
+      lib/                # 엔티티 유틸(포맷/필터 등)
     user/
 
   shared/                 # 공용 레이어
@@ -271,7 +282,7 @@ import { useProjects, projectKeys, type Project } from "@/entities/project";
 ❌ 지양(딥 임포트)
 
 ```ts
-import { useProjects } from "@/entities/project/hooks/useProjects";
+import { useProjects } from "@/entities/project/api/queries/useProjects";
 ```
 
 딥 임포트 금지는 `no-restricted-imports`로 기본 차단되어 있습니다.
@@ -310,8 +321,8 @@ export default async function Page({
 ### Entities: 도메인 데이터 접근
 
 - `entities/project/model`: 타입, key, 순수 도메인 로직
-- `entities/project/api`: fetcher
-- `entities/project/hooks`: TanStack Query hooks
+- `entities/project/api/queries`: fetcher + TanStack Query hooks
+- `entities/project/lib`: 필터/포맷 등 엔티티 유틸
 
 ### Features: 유스케이스(행동)
 
@@ -350,5 +361,5 @@ import { Button, Card, Input, Select } from "@/shared/ui";
 
 ## 11) 참고
 
-- 이 레포의 프로젝트 데이터는 `entities/project/model/mock.ts`에 **mock**으로 들어 있습니다.
+- 이 레포의 프로젝트 데이터는 `src/entities/project/model/mock.ts`에 **mock**으로 들어 있습니다.
 - 실제 프로젝트에서는 `entities/*/api`에서 BFF(Route Handlers) 또는 외부 API 서버를 붙이면 됩니다.
