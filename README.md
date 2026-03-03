@@ -41,26 +41,6 @@ RedisInsight에서 Redis 연결 시 아래 값을 사용합니다.
 
 ---
 
-## 1-3) Kafka 테스트 환경 실행
-
-테스트용으로 `Kafka(KRaft 1 broker) + Schema Registry + Kafka UI`를 별도 compose로 제공합니다.
-
-```bash
-npm run kafka:up
-```
-
-- Kafka Broker: `localhost:9092`
-- Schema Registry: http://localhost:8081
-- Kafka UI: http://localhost:8080
-
-중지/정리:
-
-```bash
-npm run kafka:down
-```
-
----
-
 ## 1-2) FastAPI 백엔드 실행
 
 이제 `/api/*`는 Next Route Handler가 **FastAPI(8000)** 로 프록시합니다.
@@ -90,6 +70,28 @@ npm run dev
 - Next API 프록시 URL: `http://localhost:3000/api/*`
 - FastAPI에서 `activity_logs`를 Supabase에 기록하려면 아래 환경 변수를 추가로 설정:
   - `SUPABASE_SERVICE_ROLE_KEY=`
+
+---
+
+## 1-3) Kafka 테스트 환경 실행
+
+테스트용으로 `Kafka(KRaft 1 broker) + Schema Registry + Kafka UI`를 별도 compose로 제공합니다.
+
+```bash
+npm run kafka:up
+```
+
+- Kafka Broker: `localhost:9094`
+- Schema Registry: http://localhost:8081
+- Kafka UI: http://localhost:8080
+
+중지/정리:
+
+```bash
+npm run kafka:down
+```
+
+---
 
 ## 2) Scripts
 
@@ -405,8 +407,8 @@ Next 16에서는 `params` / `searchParams`가 **Promise로 타입이 강제**될
 
 ```ts
 export default async function Page({
-  searchParams,
-}: {
+                                     searchParams,
+                                   }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
@@ -504,15 +506,15 @@ npm run kafka:consume:dlq
 ```
 
 1. `kafka:topics`
-   - `projects.project-created.v1`, `events.dlq.v1` 토픽을 생성합니다.
+  - `projects.project-created.v1`, `events.dlq.v1` 토픽을 생성합니다.
 2. `kafka:produce`
-   - 프로젝트 생성 이벤트를 발행합니다.
-   - `project_id`를 key로 사용해 같은 프로젝트 이벤트는 같은 파티션으로 라우팅됩니다.
+  - 프로젝트 생성 이벤트를 발행합니다.
+  - `project_id`를 key로 사용해 같은 프로젝트 이벤트는 같은 파티션으로 라우팅됩니다.
 3. `kafka:consume`
-   - 이벤트를 소비하고 정상 처리 시 offset을 커밋합니다.
-   - `force_fail=true` 이벤트는 실패로 간주하고 `events.dlq.v1`로 보냅니다.
+  - 이벤트를 소비하고 정상 처리 시 offset을 커밋합니다.
+  - `force_fail=true` 이벤트는 실패로 간주하고 `events.dlq.v1`로 보냅니다.
 4. `kafka:consume:dlq`
-   - DLQ 토픽을 읽어 실패 원인(`reason`)을 확인합니다.
+  - DLQ 토픽을 읽어 실패 원인(`reason`)을 확인합니다.
 
 #### B. 백엔드 Outbox 연동 로직
 
@@ -527,8 +529,8 @@ POST /api/projects
 
 1. 클라이언트가 `POST /api/projects` 호출
 2. 백엔드 `store.create_project()`에서
-   - 프로젝트 데이터 저장
-   - outbox 이벤트를 `pending` 상태로 함께 저장
+  - 프로젝트 데이터 저장
+  - outbox 이벤트를 `pending` 상태로 함께 저장
 3. `OUTBOX_RELAY_ENABLED=true`이면 FastAPI 시작 시 relay worker 실행
 4. relay가 pending/failed outbox를 읽어 Kafka 토픽으로 발행
 5. 발행 성공 시 outbox 상태를 `published`로 변경, 실패 시 `failed` + `attempts` 증가
