@@ -49,6 +49,10 @@ $env:SESSION_STORE_BACKEND="memory"
 # $env:SESSION_STORE_BACKEND="redis"
 # $env:REDIS_URL="redis://localhost:6379/0"
 
+# 선택(Outbox relay -> Kafka)
+# $env:OUTBOX_RELAY_ENABLED="true"
+# $env:KAFKA_BOOTSTRAP_SERVERS="localhost:9092"
+
 $env:SESSION_SINGLE_LOGIN="true"
 $env:LOGIN_RATE_LIMIT_MAX_ATTEMPTS="5"
 $env:LOGIN_RATE_LIMIT_WINDOW_SECONDS="60"
@@ -71,10 +75,38 @@ uvicorn app.main:app --reload --port 8000
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
   - 설정 시 `signup/login`은 Supabase Auth를 우선 사용
   - 미설정 시 in-memory 사용자 저장소를 사용
+- `OUTBOX_ENABLED`
+  - 기본 `true`
+  - `create project` 시 outbox 이벤트를 함께 기록
+- `OUTBOX_RELAY_ENABLED`
+  - 기본 `false`
+  - `true`일 때 FastAPI 시작 시 relay worker가 pending outbox를 Kafka로 전송
+- `KAFKA_BOOTSTRAP_SERVERS`
+  - 기본 `localhost:9092`
+- `KAFKA_PROJECTS_CREATED_TOPIC`
+  - 기본 `projects.project-created.v1`
+- `OUTBOX_RELAY_POLL_INTERVAL_SECONDS`, `OUTBOX_RELAY_BATCH_SIZE`, `OUTBOX_RELAY_MAX_ATTEMPTS`
+  - relay polling/batch/retry 제어
 
 ## 3) 테스트
 
 ```bash
 cd backend
 PYTHONPATH=. pytest -q
+```
+
+## 4) Outbox 동작 확인
+
+1. 프로젝트 생성
+
+```bash
+curl -X POST http://localhost:8000/api/projects \
+  -H "Content-Type: application/json" \
+  -d '{"id":"obx-1","name":"Outbox sample"}'
+```
+
+2. outbox 요약 확인
+
+```bash
+curl http://localhost:8000/api/projects/outbox/summary
 ```

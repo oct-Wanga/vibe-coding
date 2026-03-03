@@ -29,6 +29,12 @@ def create_project(body: ProjectCreateBody, response: Response, request_id: str 
     return project
 
 
+@router.get("/outbox/summary")
+def get_outbox_summary(response: Response, request_id: str = Depends(get_request_id)) -> dict[str, int]:
+    response.headers["x-request-id"] = request_id
+    return store.get_outbox_summary()
+
+
 @router.get("/{project_id}", response_model=Project)
 def get_project(project_id: str, response: Response, request_id: str = Depends(get_request_id)) -> Project:
     response.headers["x-request-id"] = request_id
