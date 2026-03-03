@@ -13,6 +13,13 @@
     "test": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "kafka:up": "docker compose -f docker-compose.kafka.yml up -d",
+    "kafka:down": "docker compose -f docker-compose.kafka.yml down -v",
+    "kafka:topics": "node scripts/kafka/create-topics.mjs",
+    "kafka:produce": "node scripts/kafka/produce-project-events.mjs",
+    "kafka:consume": "node scripts/kafka/consume-project-events.mjs",
+    "kafka:consume:dlq": "node scripts/kafka/consume-dlq.mjs",
+    "kafka:test": "node scripts/kafka/smoke-test.mjs",
     "release": "npx semantic-release",
     "release:dry-run": "npx semantic-release --dry-run"
   },
@@ -32,6 +39,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hook-form": "^7.54.2",
+    "kafkajs": "^2.2.4",
     "tailwind-merge": "^3.4.0",
     "zod": "^3.24.1",
     "zustand": "^4.5.5"
