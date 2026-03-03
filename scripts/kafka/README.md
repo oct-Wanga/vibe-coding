@@ -2,6 +2,38 @@
 
 이 폴더는 Kafka를 처음 접하는 사람도 바로 실험할 수 있게 만든 샘플 스크립트 모음입니다.
 
+## 0) Kafka 개념 빠르게 이해하기
+
+- `Broker`: Kafka 서버 1대(이 프로젝트는 단일 브로커)
+- `Topic`: 메시지를 저장하는 논리적 채널(예: `projects.project-created.v1`)
+- `Partition`: Topic을 나눈 단위. 병렬 처리와 순서 보장 기준
+- `Key`: 같은 key는 같은 partition으로 가므로 엔티티 단위 순서 보장에 사용
+- `Consumer Group`: 같은 그룹 내 컨슈머들은 파티션을 나눠 읽음
+- `Offset`: 파티션에서 어디까지 읽었는지 위치
+- `Lag`: "토픽에 쌓인 양 - 소비 완료 양"
+- `DLQ(Dead Letter Queue)`: 처리 실패 메시지를 따로 모으는 토픽
+
+이 프로젝트에서는 아래 2개 토픽을 사용합니다.
+
+- `projects.project-created.v1`: 정상 이벤트 흐름
+- `events.dlq.v1`: 실패 이벤트 보관
+
+## 0-1) 이 프로젝트 Kafka 로직
+
+### A. 스크립트 학습 로직
+
+1. Producer가 `projects.project-created.v1`에 이벤트 발행
+2. Consumer가 이벤트 처리
+3. 실패 이벤트(`force_fail=true`)는 `events.dlq.v1`로 이동
+4. DLQ Consumer로 실패 원인 확인
+
+### B. 백엔드 Outbox 로직
+
+1. API에서 프로젝트 저장 시 outbox 이벤트를 `pending`으로 함께 저장
+2. Relay worker가 pending/failed outbox를 주기적으로 조회
+3. Kafka 발행 성공 시 `published`, 실패 시 `failed` + 재시도 카운트 증가
+4. 필요하면 별도 consumer가 비즈니스 후처리 수행
+
 ## 1) 무엇이 들어있나
 
 - `create-topics.mjs`: 테스트용 토픽 생성
