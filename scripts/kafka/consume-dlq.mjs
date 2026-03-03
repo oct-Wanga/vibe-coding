@@ -20,6 +20,7 @@ const toText = (bufferValue) => (bufferValue ? bufferValue.toString() : "");
 
 const main = async () => {
   await consumer.connect();
+  // 로컬 디버깅 편의를 위해 처음 오프셋부터 읽음
   await consumer.subscribe({ topic: TOPICS.dlq, fromBeginning: true });
 
   await consumer.run({

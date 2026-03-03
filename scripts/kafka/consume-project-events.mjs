@@ -36,6 +36,7 @@ const handleRecord = async ({ key, value, offset }) => {
     console.log(`[ok] offset=${offset} key=${keyText} project=${event.project_id}`);
     return "ok";
   } catch (error) {
+    // 재처리/원인분석이 가능하도록 실패 컨텍스트를 DLQ에 저장
     const dlqEvent = {
       source_topic: TOPICS.projectsCreated,
       failed_offset: offset,
@@ -69,6 +70,7 @@ const main = async () => {
   await consumer.subscribe({ topic: TOPICS.projectsCreated, fromBeginning: true });
 
   await consumer.run({
+    // 수동 커밋으로 "처리하지 못한 레코드의 오프셋 선커밋"을 방지
     autoCommit: false,
     eachBatchAutoResolve: false,
     eachBatch: async ({ batch, heartbeat, resolveOffset, commitOffsetsIfNecessary, isRunning, isStale }) => {

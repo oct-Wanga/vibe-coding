@@ -64,6 +64,7 @@ const runWorker = async () => {
         }
 
         if (payload?.run_id !== runId) {
+          // 다른 실행(run_id)의 과거 메시지는 건너뜀.
           resolveOffset(message.offset);
           await commitOffsetsIfNecessary();
           await heartbeat();
@@ -102,6 +103,7 @@ const runWorker = async () => {
         }
 
         if (scanned > totalMessages * 50) {
+          // 토픽이 너무 오래 쌓였을 때 무한 스캔을 방지.
           throw new Error("too many historical records scanned; clean topic or adjust retention");
         }
       }
@@ -142,15 +144,18 @@ const verifyDlq = async (expectedDlqCount) => {
 };
 
 const main = async () => {
+  // 1) 토픽 보장
   await admin.connect();
   await admin.createTopics({ waitForLeaders: true, topics: TOPIC_CONFIGS });
   await admin.disconnect();
 
+  // 2) 테스트 이벤트 발행
   await producer.connect();
   const messages = Array.from({ length: totalMessages }, (_, index) => makeEvent(index));
   await producer.send({ topic: TOPICS.projectsCreated, acks: -1, messages });
   await producer.disconnect();
 
+  // 3) 워커 처리 + DLQ 검증
   const expectedDlqCount = failEvery > 0 ? Math.ceil(totalMessages / failEvery) : 0;
   const { okCount, dlqCount } = await runWorker();
   const dlqVerified = await verifyDlq(expectedDlqCount);

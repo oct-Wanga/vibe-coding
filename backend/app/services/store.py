@@ -86,6 +86,7 @@ class InMemoryStore:
             "topic": settings.kafka_projects_created_topic,
             "event_key": project.id,
             "payload": {
+                # consumer가 재처리하기 좋도록 이벤트 메타 + 도메인 스냅샷을 함께 저장
                 "event_id": str(uuid4()),
                 "event_type": "project.created",
                 "schema_version": 1,
@@ -98,8 +99,9 @@ class InMemoryStore:
             "published_at": None,
             "last_error": None,
         }
-        # In real systems this should be one DB transaction.
+        # 실제 운영에서는 DB 트랜잭션 1개로 처리해야 한다.
         with self._lock:
+            # 데모에서는 lock으로 원자성을 흉내 내고, 실제 운영은 DB 트랜잭션으로 처리한다.
             self.projects[project.id] = project
             if settings.outbox_enabled:
                 self.outbox_events[outbox_event["id"]] = outbox_event

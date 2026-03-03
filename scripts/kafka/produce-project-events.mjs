@@ -15,6 +15,7 @@ const kafka = new Kafka({
 });
 
 const producer = kafka.producer({
+  // 실무 기본 안전값: 안정적 파티셔닝 + 멱등 프로듀서
   createPartitioner: Partitioners.DefaultPartitioner,
   idempotent: true,
   maxInFlightRequests: 1,
@@ -23,6 +24,7 @@ const producer = kafka.producer({
 
 const buildMessage = (index) => {
   const projectId = `project-${(index % 8) + 1}`;
+  // force_fail 플래그로 워커에서 DLQ 흐름을 재현
   const shouldFail = failEvery > 0 && index % failEvery === 0;
   const payload = {
     event_id: crypto.randomUUID(),
