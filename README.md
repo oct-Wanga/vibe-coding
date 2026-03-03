@@ -41,6 +41,26 @@ RedisInsight에서 Redis 연결 시 아래 값을 사용합니다.
 
 ---
 
+## 1-3) Kafka 테스트 환경 실행
+
+테스트용으로 `Kafka(KRaft 1 broker) + Schema Registry + Kafka UI`를 별도 compose로 제공합니다.
+
+```bash
+npm run kafka:up
+```
+
+- Kafka Broker: `localhost:9092`
+- Schema Registry: http://localhost:8081
+- Kafka UI: http://localhost:8080
+
+중지/정리:
+
+```bash
+npm run kafka:down
+```
+
+---
+
 ## 1-2) FastAPI 백엔드 실행
 
 이제 `/api/*`는 Next Route Handler가 **FastAPI(8000)** 로 프록시합니다.
@@ -93,6 +113,16 @@ npm run format:fix
 npm run test            # unit (vitest)
 npm run test:e2e        # e2e (playwright)
 npm run test:e2e:ui
+
+# kafka (로컬 테스트)
+npm run kafka:up
+npm run kafka:topics
+npm run kafka:produce
+npm run kafka:consume
+npm run kafka:consume:dlq
+npm run kafka:test      # 100건 발행 + DLQ 검증 smoke test
+npm run kafka:down
+
 npm run release:dry-run # 릴리즈 시뮬레이션
 npm run release         # semantic-release 실행
 ```
@@ -433,3 +463,50 @@ import { Button, Card, Input, Select } from "@/shared/ui";
 
 - 이 레포의 프로젝트 데이터는 `src/entities/project/model/mock.ts`에 **mock**으로 들어 있습니다.
 - 실제 프로젝트에서는 `entities/*/api`에서 BFF(Route Handlers) 또는 외부 API 서버를 붙이면 됩니다.
+
+---
+
+## 12) Kafka 테스트 시나리오
+
+### 빠른 시작
+
+```bash
+npm run kafka:up
+npm run kafka:topics
+npm run kafka:test
+```
+
+`kafka:test`는 아래를 자동으로 수행합니다.
+
+1. 토픽 생성 확인 (`projects.project-created.v1`, `events.dlq.v1`)
+2. 테스트 이벤트 100건 발행 (`FAIL_EVERY=10` 기본)
+3. 컨슈머 처리 중 실패 이벤트를 DLQ로 이동
+4. DLQ 건수 검증 후 성공/실패 출력
+
+### 수동 확인 (학습용)
+
+터미널 A:
+
+```bash
+npm run kafka:consume
+```
+
+터미널 B:
+
+```bash
+npm run kafka:produce
+```
+
+터미널 C:
+
+```bash
+npm run kafka:consume:dlq
+```
+
+### 환경 변수(선택)
+
+- `COUNT`: 발행 건수 (기본 `100`)
+- `FAIL_EVERY`: N건마다 실패 이벤트 주입 (기본 `10`)
+- `RUN_ID`: 실행 식별자(미지정 시 자동 생성)
+- `GROUP_ID`: 컨슈머 그룹 ID(미지정 시 자동 생성)
+- `MAX_MESSAGES`: consumer가 처리 후 종료할 최대 건수 (`0`이면 계속 실행)
