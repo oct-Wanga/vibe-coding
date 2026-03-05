@@ -78,6 +78,13 @@ class InMemoryStore:
             created_at=now,
             updated_at=now,
         )
+        self.enqueue_project_created_event(project)
+        with self._lock:
+            self.projects[project.id] = project
+        return deepcopy(project)
+
+    def enqueue_project_created_event(self, project: Project) -> None:
+        now = datetime.now(timezone.utc)
         outbox_event: OutboxEvent = {
             "id": str(uuid4()),
             "aggregate_type": "project",
@@ -102,10 +109,8 @@ class InMemoryStore:
         # 실제 운영에서는 DB 트랜잭션 1개로 처리해야 한다.
         with self._lock:
             # 데모에서는 lock으로 원자성을 흉내 내고, 실제 운영은 DB 트랜잭션으로 처리한다.
-            self.projects[project.id] = project
             if settings.outbox_enabled:
                 self.outbox_events[outbox_event["id"]] = outbox_event
-        return deepcopy(project)
 
     def update_project(
         self,
