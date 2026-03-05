@@ -74,7 +74,8 @@ uvicorn app.main:app --reload --port 8000
 - `LOGIN_RATE_LIMIT_MAX_ATTEMPTS`, `LOGIN_RATE_LIMIT_WINDOW_SECONDS`: 로그인 시도 제한 정책
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
   - 설정 시 `signup/login`은 Supabase Auth를 우선 사용
-  - 미설정 시 in-memory 사용자 저장소를 사용
+  - 설정 시 `projects` CRUD도 Supabase `projects` 테이블을 우선 사용
+  - 미설정 시 사용자/프로젝트는 in-memory 저장소를 사용
 - `OUTBOX_ENABLED`
   - 기본 `true`
   - `create project` 시 outbox 이벤트를 함께 기록
