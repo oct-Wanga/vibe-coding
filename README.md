@@ -91,6 +91,12 @@ npm run kafka:up
 npm run kafka:down
 ```
 
+앱(`api/web`) + Kafka를 한 번에 올리려면:
+
+```bash
+npm run kafka:up:all
+```
+
 ---
 
 ## 2) Scripts
@@ -580,3 +586,11 @@ npm run kafka:consume:dlq
 - `RUN_ID`: 실행 식별자(미지정 시 자동 생성)
 - `GROUP_ID`: 컨슈머 그룹 ID(미지정 시 자동 생성)
 - `MAX_MESSAGES`: consumer가 처리 후 종료할 최대 건수 (`0`이면 계속 실행)
+
+### 실행 환경별 Kafka 주소 기준
+
+- 로컬에서 Node 스크립트 실행(`npm run kafka:*`): `localhost:9094`
+- Docker `api` 컨테이너에서 Kafka 접근: `kafka:9092`
+
+`docker-compose.yml`의 `api` 서비스는 위 기준에 맞게
+`OUTBOX_RELAY_ENABLED=true`, `KAFKA_BOOTSTRAP_SERVERS=kafka:9092`로 기본 설정되어 있습니다.
