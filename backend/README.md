@@ -51,7 +51,7 @@ $env:SESSION_STORE_BACKEND="memory"
 
 # 선택(Outbox relay -> Kafka)
 # $env:OUTBOX_RELAY_ENABLED="true"
-# $env:KAFKA_BOOTSTRAP_SERVERS="localhost:9092"
+# $env:KAFKA_BOOTSTRAP_SERVERS="localhost:9094"
 
 $env:SESSION_SINGLE_LOGIN="true"
 $env:LOGIN_RATE_LIMIT_MAX_ATTEMPTS="5"
@@ -82,7 +82,8 @@ uvicorn app.main:app --reload --port 8000
   - 기본 `false`
   - `true`일 때 FastAPI 시작 시 relay worker가 pending outbox를 Kafka로 전송
 - `KAFKA_BOOTSTRAP_SERVERS`
-  - 기본 `localhost:9092`
+  - 로컬 직접 실행 기본 `localhost:9094`
+  - Docker `api` 컨테이너 실행 시 `kafka:9092`
 - `KAFKA_PROJECTS_CREATED_TOPIC`
   - 기본 `projects.project-created.v1`
 - `OUTBOX_RELAY_POLL_INTERVAL_SECONDS`, `OUTBOX_RELAY_BATCH_SIZE`, `OUTBOX_RELAY_MAX_ATTEMPTS`
