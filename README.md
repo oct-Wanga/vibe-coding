@@ -131,6 +131,9 @@ npm run test:all        # web unit + api test 순차 실행
 npm run test:e2e        # e2e (playwright)
 npm run test:e2e:ui
 
+# API 테스트 상세 로그가 필요하면
+npm run test:api -- -vv -s
+
 # kafka (로컬 테스트)
 npm run kafka:up
 npm run kafka:topics
@@ -163,7 +166,7 @@ npm run release         # semantic-release 실행
 | `format:fix`        | 전체 Prettier 자동 수정           |
 | `test`              | 웹 unit 테스트 실행(기본)         |
 | `test:web`          | `apps/web` Vitest 실행            |
-| `test:api`          | `apps/api` pytest 실행            |
+| `test:api`          | `apps/api` pytest 실행 (`--` 뒤 인자 전달 가능) |
 | `test:all`          | 웹 unit + API 테스트 순차 실행    |
 | `test:e2e`          | 웹 Playwright E2E 실행            |
 | `test:e2e:ui`       | 웹 Playwright UI 모드 실행        |

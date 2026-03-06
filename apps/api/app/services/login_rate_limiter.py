@@ -75,18 +75,56 @@ class InMemoryLoginRateLimiter:
         self._store.pop(key, None)
 
 
+class FailoverLoginRateLimiter:
+    def __init__(self, primary: LoginRateLimiter | None, fallback: LoginRateLimiter) -> None:
+        self._primary = primary
+        self._fallback = fallback
+
+    def is_limited(self, key: str) -> bool:
+        if self._primary is None:
+            return self._fallback.is_limited(key)
+        try:
+            return self._primary.is_limited(key)
+        except RedisError:
+            self._primary = None
+            return self._fallback.is_limited(key)
+
+    def add_failure(self, key: str) -> int:
+        if self._primary is None:
+            return self._fallback.add_failure(key)
+        try:
+            return self._primary.add_failure(key)
+        except RedisError:
+            self._primary = None
+            return self._fallback.add_failure(key)
+
+    def reset(self, key: str) -> None:
+        if self._primary is None:
+            self._fallback.reset(key)
+            return
+        try:
+            self._primary.reset(key)
+        except RedisError:
+            self._primary = None
+            self._fallback.reset(key)
+
+
 def create_login_rate_limiter() -> LoginRateLimiter:
-    try:
-        return RedisLoginRateLimiter(
-            redis_url=settings.redis_url,
-            max_attempts=settings.login_rate_limit_max_attempts,
-            window_seconds=settings.login_rate_limit_window_seconds,
-        )
-    except RedisError:
-        return InMemoryLoginRateLimiter(
-            max_attempts=settings.login_rate_limit_max_attempts,
-            window_seconds=settings.login_rate_limit_window_seconds,
-        )
+    fallback = InMemoryLoginRateLimiter(
+        max_attempts=settings.login_rate_limit_max_attempts,
+        window_seconds=settings.login_rate_limit_window_seconds,
+    )
+    if settings.session_store_backend == "memory":
+        return fallback
+
+    primary = RedisLoginRateLimiter(
+        redis_url=settings.redis_url,
+        max_attempts=settings.login_rate_limit_max_attempts,
+        window_seconds=settings.login_rate_limit_window_seconds,
+    )
+    if settings.login_rate_limit_fallback_to_memory:
+        return FailoverLoginRateLimiter(primary=primary, fallback=fallback)
+    return primary
 
 
 login_rate_limiter = create_login_rate_limiter()

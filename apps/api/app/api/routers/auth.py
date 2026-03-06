@@ -15,6 +15,27 @@ from app.services.user_profile_sync import upsert_signup_profile
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+def _is_login_rate_limited(limit_key: str) -> bool:
+    try:
+        return login_rate_limiter.is_limited(limit_key)
+    except RedisError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="로그인 제한 저장소 오류") from exc
+
+
+def _add_login_failure(limit_key: str) -> None:
+    try:
+        login_rate_limiter.add_failure(limit_key)
+    except RedisError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="로그인 제한 저장소 오류") from exc
+
+
+def _reset_login_failure(limit_key: str) -> None:
+    try:
+        login_rate_limiter.reset(limit_key)
+    except RedisError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="로그인 제한 저장소 오류") from exc
+
+
 @router.post("/signup")
 def signup(body: SignupBody, response: Response, request_id: str = Depends(get_request_id)) -> dict[str, object]:
     response.headers["x-request-id"] = request_id
@@ -41,20 +62,20 @@ def login(
     response.headers["x-request-id"] = request_id
     client_ip = request.client.host if request.client else "unknown"
     limit_key = f"{client_ip}:{body.email.lower()}"
-    if login_rate_limiter.is_limited(limit_key):
+    if _is_login_rate_limited(limit_key):
         raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="로그인 시도 횟수 초과")
 
     if has_supabase_auth_config():
         user_id, error = login_user(body.email, body.password)
         if error or not user_id:
-            login_rate_limiter.add_failure(limit_key)
+            _add_login_failure(limit_key)
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=error or "로그인 실패")
     else:
         user_id = store.verify_login(body.email, body.password)
         if not user_id:
-            login_rate_limiter.add_failure(limit_key)
+            _add_login_failure(limit_key)
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="로그인 실패")
-    login_rate_limiter.reset(limit_key)
+    _reset_login_failure(limit_key)
 
     try:
         token = session_store.create(user_id)

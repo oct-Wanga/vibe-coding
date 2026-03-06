@@ -1,12 +1,3 @@
-import os
-
-os.environ["SESSION_STORE_BACKEND"] = "memory"
-os.environ["OUTBOX_ENABLED"] = "true"
-os.environ["SUPABASE_URL"] = ""
-os.environ["SUPABASE_SERVICE_ROLE_KEY"] = ""
-os.environ["NEXT_PUBLIC_SUPABASE_URL"] = ""
-os.environ["NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY"] = ""
-
 from fastapi.testclient import TestClient
 
 from app.main import app
