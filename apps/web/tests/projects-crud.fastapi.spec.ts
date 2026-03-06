@@ -1,8 +1,24 @@
+import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
 import { isFastApiBackend } from "./backendMode";
 
 test.skip(!isFastApiBackend, "fastapi backend 전용 테스트");
+
+async function ensureAuthenticated(page: Page): Promise<void> {
+  const email = `e2e_fastapi_${Date.now()}@example.com`;
+  const password = "secret1234";
+
+  const signupResponse = await page.request.post("/api/auth/signup", {
+    data: { email, password },
+  });
+  expect(signupResponse.ok()).toBeTruthy();
+
+  const loginResponse = await page.request.post("/api/auth/login", {
+    data: { email, password },
+  });
+  expect(loginResponse.ok()).toBeTruthy();
+}
 
 test.describe("Projects CRUD (/projects, fastapi)", () => {
   test("create, update, archive, delete flow", async ({ page }) => {
@@ -10,6 +26,7 @@ test.describe("Projects CRUD (/projects, fastapi)", () => {
     const projectName = `E2E Project ${uniqueId}`;
     const updatedName = `${projectName} Updated`;
 
+    await ensureAuthenticated(page);
     await page.goto("/projects");
 
     await page.getByPlaceholder("type project name").fill(projectName);
@@ -49,10 +66,11 @@ test.describe("Projects CRUD (/projects, fastapi)", () => {
     await expect(page.locator("li", { hasText: updatedName })).toHaveCount(0);
   });
 
-  test("create project shows in list without auth", async ({ page }) => {
+  test("create project shows in list", async ({ page }) => {
     const uniqueId = `p_e2e_list_${Date.now()}`;
     const projectName = `E2E List ${uniqueId}`;
 
+    await ensureAuthenticated(page);
     await page.goto("/projects");
 
     await page.getByPlaceholder("프로젝트 이름").fill(projectName);
