@@ -149,6 +149,7 @@ npm run release         # semantic-release 실행
   - `apps/api`: FastAPI 워크스페이스 엔트리
   - `packages/contracts`: 웹에서 재사용하는 공용 API 계약(schema/type) 패키지
 - 기본 실행/개발 경로는 `apps/*` 기준으로 통일했습니다.
+- 의존성은 원칙적으로 워크스페이스별로 선언하고, 루트는 오케스트레이션/공용 스크립트용 최소 의존성만 유지합니다.
 
 > `next lint --fix`는 Next 16에서 동작이 달라질 수 있어 본 프로젝트는 **eslint를 직접 실행**합니다.
 
