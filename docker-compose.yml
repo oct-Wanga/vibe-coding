@@ -39,7 +39,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: apps/web/Dockerfile
       args:
         API_BACKEND: fastapi
         FASTAPI_BASE_URL: http://api:8000
