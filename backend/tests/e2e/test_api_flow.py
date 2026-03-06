@@ -1,6 +1,11 @@
 import os
 
 os.environ["SESSION_STORE_BACKEND"] = "memory"
+os.environ["OUTBOX_ENABLED"] = "true"
+os.environ["SUPABASE_URL"] = ""
+os.environ["SUPABASE_SERVICE_ROLE_KEY"] = ""
+os.environ["NEXT_PUBLIC_SUPABASE_URL"] = ""
+os.environ["NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY"] = ""
 
 from fastapi.testclient import TestClient
 
@@ -27,6 +32,11 @@ def test_api_signup_login_and_projects_flow() -> None:
 
     create = client.post("/api/projects", json={"id": "e2e-p1", "name": "E2E 프로젝트"})
     assert create.status_code == 201
+
+    outbox_summary = client.get("/api/projects/outbox/summary")
+    assert outbox_summary.status_code == 200
+    assert outbox_summary.json()["total"] >= 1
+    assert outbox_summary.json()["pending"] >= 1
 
     list_response = client.get("/api/projects")
     assert list_response.status_code == 200

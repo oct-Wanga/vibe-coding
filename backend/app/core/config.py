@@ -23,6 +23,15 @@ class Settings(BaseSettings):
     supabase_url: str | None = None
     supabase_service_role_key: str | None = None
 
+    outbox_enabled: bool = True
+    outbox_relay_enabled: bool = False
+    outbox_relay_poll_interval_seconds: float = 1.0
+    outbox_relay_batch_size: int = 100
+    outbox_relay_max_attempts: int = 10
+    kafka_bootstrap_servers: str = "localhost:9092"
+    kafka_projects_created_topic: str = "projects.project-created.v1"
+    kafka_client_id: str = "fastapi-outbox-relay"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

@@ -1,5 +1,6 @@
 import pytest
 
+from app.core.config import settings
 from app.services.session_store import DuplicateSessionError, InMemorySessionStore
 from app.services.store import InMemoryStore
 
@@ -20,6 +21,40 @@ def test_store_project_crud() -> None:
     assert project.status == "archived"
 
     assert store.delete_project("p-1") is True
+
+
+def test_create_project_enqueues_outbox_event() -> None:
+    settings.outbox_enabled = True
+    store = InMemoryStore()
+
+    before = store.get_outbox_summary()
+    created = store.create_project("p-outbox-1", "Outbox 프로젝트")
+    after = store.get_outbox_summary()
+
+    assert created.id == "p-outbox-1"
+    assert after["total"] == before["total"] + 1
+    assert after["pending"] == before["pending"] + 1
+
+    candidates = store.list_relay_candidate_outbox_events(limit=10, max_attempts=10)
+    matched = [event for event in candidates if event["aggregate_id"] == "p-outbox-1"]
+    assert len(matched) == 1
+    assert matched[0]["event_type"] == "project.created"
+
+
+def test_outbox_mark_published_and_failed() -> None:
+    settings.outbox_enabled = True
+    store = InMemoryStore()
+    store.create_project("p-outbox-2", "Outbox 프로젝트 2")
+    candidates = store.list_relay_candidate_outbox_events(limit=10, max_attempts=10)
+    target = next(event for event in candidates if event["aggregate_id"] == "p-outbox-2")
+
+    assert store.mark_outbox_failed(target["id"], "kafka timeout") is True
+    failed_summary = store.get_outbox_summary()
+    assert failed_summary["failed"] >= 1
+
+    assert store.mark_outbox_published(target["id"]) is True
+    final_summary = store.get_outbox_summary()
+    assert final_summary["published"] >= 1
 
 
 def test_signup_hashes_password_and_verify_login() -> None:
