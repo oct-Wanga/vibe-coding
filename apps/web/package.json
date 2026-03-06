@@ -1,6 +1,9 @@
 {
   "name": "@apps/web",
   "private": true,
+  "dependencies": {
+    "@repo/contracts": "*"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

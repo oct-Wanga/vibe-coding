@@ -1,9 +1,6 @@
 export type UserId = string;
 
-export type SignupBody = {
-  email: string;
-  password: string;
-};
+export type { SignupBody } from "@repo/contracts/auth";
 
 export type User = {
   id: UserId;

@@ -1,17 +1,6 @@
-export type ProjectStatus = "active" | "archived";
+import type { Project, ProjectsParams, ProjectStatus } from "@repo/contracts/project";
 
-export type Project = {
-  id: string;
-  name: string;
-  status: ProjectStatus;
-  created_at: string;
-  updated_at: string;
-};
-
-export type ProjectsParams = {
-  q?: string;
-  status?: ProjectStatus | "all";
-};
+export type { Project, ProjectsParams, ProjectStatus };
 
 export function isArchived(project: Pick<Project, "status">) {
   return project.status === "archived";
