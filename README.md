@@ -51,7 +51,7 @@ cd apps/api
 pip install -r requirements.txt
 # Redis가 없으면 세션 저장소를 memory로 지정
 # export SESSION_STORE_BACKEND=memory
-uvicorn app.main:app --reload --port 8000
+python -m uvicorn app.main:app --reload --port 8000
 
 # 프론트엔드(루트, macOS/Linux)
 API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run dev
@@ -142,12 +142,12 @@ npm run release:dry-run # 릴리즈 시뮬레이션
 npm run release         # semantic-release 실행
 ```
 
-### 2-1) Workspace(모노레포 1단계)
+### 2-1) Workspace(모노레포)
 
 - 루트는 워크스페이스 오케스트레이터 역할을 하며, 앱 엔트리는 아래와 같습니다.
   - `apps/web`: Next.js 워크스페이스 엔트리(실소스는 `apps/web` 기준)
   - `apps/api`: FastAPI 워크스페이스 엔트리
-- 점진적으로 `apps/*`, `packages/*` 구조로 이동할 수 있도록 1단계 레이아웃을 적용했습니다.
+- 기본 실행/개발 경로는 `apps/*` 기준으로 통일했습니다.
 
 > `next lint --fix`는 Next 16에서 동작이 달라질 수 있어 본 프로젝트는 **eslint를 직접 실행**합니다.
 
@@ -215,7 +215,7 @@ API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run test:e2e
 
 - `GET /api/health`
 
-요청에는 `x-request-id`가 자동으로 부여되며 헬스 응답에도 포함됩니다(프록시 경로는 `proxy.ts` 기준).
+요청에는 `x-request-id`가 자동으로 부여되며 헬스 응답에도 포함됩니다(프록시 경로는 `apps/web/proxy.ts` 기준).
 
 ### 구조화 로그 유틸
 
@@ -353,7 +353,15 @@ npm run release:dry-run
 
 ## 5) 디렉토리 구조
 
-```
+```text
+apps/
+  web/
+    src/
+    tests/
+  api/
+    app/
+    tests/
+
 apps/web/src/
   app/                    # Next App Router 엔트리
     (marketing)/
