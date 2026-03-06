@@ -1,7 +1,7 @@
 ---
 description: "Data Fetching: Track A/B, RSC vs React Query, SSOT"
 globs:
-  - "src/**/*.{ts,tsx}"
+  - "apps/web/src/**/*.{ts,tsx}"
 ---
 
 # Data Fetching Rules (Track 기반)

@@ -1,7 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("Auth submit", () => {
-  test("signup shows confirmPassword mismatch then success message on real API", async ({ page }) => {
+  test("signup shows confirmPassword mismatch then success message on real API", async ({
+    page,
+  }) => {
     await page.goto("/?auth=signup");
 
     const form = page.locator("form");

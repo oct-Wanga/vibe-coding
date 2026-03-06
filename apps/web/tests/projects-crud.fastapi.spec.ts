@@ -36,7 +36,8 @@ test.describe("Projects CRUD (/projects, fastapi)", () => {
 
     const deleteResponsePromise = page.waitForResponse(
       (response) =>
-        response.request().method() === "DELETE" && response.url().includes(`/api/projects/${uniqueId}`),
+        response.request().method() === "DELETE" &&
+        response.url().includes(`/api/projects/${uniqueId}`),
     );
     await page.getByRole("button", { name: "삭제" }).click();
     await page.getByRole("button", { name: "정말 삭제" }).click();
@@ -64,7 +65,8 @@ test.describe("Projects CRUD (/projects, fastapi)", () => {
     await listItem.getByRole("link", { name: "Open" }).click();
     const deleteResponsePromise = page.waitForResponse(
       (response) =>
-        response.request().method() === "DELETE" && response.url().includes(`/api/projects/${uniqueId}`),
+        response.request().method() === "DELETE" &&
+        response.url().includes(`/api/projects/${uniqueId}`),
     );
     await page.getByRole("button", { name: "삭제" }).click();
     await page.getByRole("button", { name: "정말 삭제" }).click();

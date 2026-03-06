@@ -18,7 +18,7 @@ ENV FASTAPI_BASE_URL=$FASTAPI_BASE_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN npm run build
+RUN npm run build:web
 
 FROM node:20-alpine AS runner
 WORKDIR /app
@@ -33,9 +33,9 @@ ENV FASTAPI_BASE_URL=$FASTAPI_BASE_URL
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
 
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/apps/web/public ./apps/web/public
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
 
 USER nextjs
 

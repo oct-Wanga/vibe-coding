@@ -3,9 +3,9 @@ import "dotenv/config";
 import { defineConfig } from "@playwright/test";
 import dotenv from "dotenv";
 
-dotenv.config({ path: ".env.local" });
+dotenv.config({ path: "../../.env.local" });
 export default defineConfig({
-  testDir: "./tests/e2e",
+  testDir: "./tests",
   use: {
     baseURL: process.env.E2E_BASE_URL ?? "http://localhost:3000",
   },
