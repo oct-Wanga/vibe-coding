@@ -47,11 +47,11 @@ RedisInsight에서 Redis 연결 시 아래 값을 사용합니다.
 
 ```bash
 # 백엔드
-cd backend
+cd apps/api
 pip install -r requirements.txt
 # Redis가 없으면 세션 저장소를 memory로 지정
 # export SESSION_STORE_BACKEND=memory
-uvicorn app.main:app --reload --port 8000
+python -m uvicorn app.main:app --reload --port 8000
 
 # 프론트엔드(루트, macOS/Linux)
 API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run dev
@@ -104,13 +104,19 @@ npm run kafka:up:all
 ```bash
 # 개발
 npm run dev
+npm run dev:web
+npm run dev:api
+npm run dev:all      # web+api 동시 실행
 
 # 빌드
 npm run build
+npm run build:web
 npm run start
+npm run start:web
 
 # 린트(ESLint)
 npm run lint
+npm run lint:web
 npm run lint:fix
 
 # 포맷(Prettier)
@@ -119,27 +125,80 @@ npm run format:fix
 
 # 테스트
 npm run test            # unit (vitest)
+npm run test:web
+npm run test:api
+npm run test:all        # web unit + api test 순차 실행
 npm run test:e2e        # e2e (playwright)
 npm run test:e2e:ui
 
+# API 테스트 상세 로그가 필요하면
+npm run test:api -- -vv -s
+
 # kafka (로컬 테스트)
 npm run kafka:up
+npm run containers:up    # 앱+Kafka 전체 컨테이너 실행
 npm run kafka:topics
 npm run kafka:produce
 npm run kafka:consume
 npm run kafka:consume:dlq
 npm run kafka:test      # 100건 발행 + DLQ 검증 smoke test
 npm run kafka:down
+npm run containers:down  # 앱+Kafka 전체 컨테이너 종료/정리
 
 npm run release:dry-run # 릴리즈 시뮬레이션
 npm run release         # semantic-release 실행
 ```
 
+### 2-0) 스크립트 역할 요약
+
+| 스크립트            | 역할                              |
+| ------------------- | --------------------------------- |
+| `dev`               | 웹 개발 서버 실행(기본)           |
+| `dev:web`           | `apps/web` Next 개발 서버 실행    |
+| `dev:api`           | `apps/api` FastAPI 개발 서버 실행 |
+| `dev:all`           | 웹/백엔드 개발 서버 동시 실행     |
+| `build`             | 웹 프로덕션 빌드 실행(기본)       |
+| `build:web`         | `apps/web` 빌드                   |
+| `start`             | 웹 프로덕션 서버 실행(기본)       |
+| `start:web`         | `apps/web` 프로덕션 서버 실행     |
+| `lint`              | 웹 ESLint 검사(기본)              |
+| `lint:web`          | `apps/web` ESLint 검사            |
+| `lint:fix`          | 웹 ESLint 자동 수정               |
+| `format`            | 전체 Prettier 검사                |
+| `format:fix`        | 전체 Prettier 자동 수정           |
+| `test`              | 웹 unit 테스트 실행(기본)         |
+| `test:web`          | `apps/web` Vitest 실행            |
+| `test:api`          | `apps/api` pytest 실행 (`--` 뒤 인자 전달 가능) |
+| `test:all`          | 웹 unit + API 테스트 순차 실행    |
+| `test:e2e`          | 웹 Playwright E2E 실행            |
+| `test:e2e:ui`       | 웹 Playwright UI 모드 실행        |
+| `kafka:up`          | Kafka 테스트 인프라 실행          |
+| `kafka:up:all`      | 앱 + Kafka 인프라 동시 실행       |
+| `containers:up`     | 앱 + Kafka 전체 컨테이너 실행     |
+| `kafka:down`        | Kafka 테스트 인프라 종료/정리     |
+| `containers:down`   | 앱 + Kafka 전체 컨테이너 종료/정리 |
+| `kafka:topics`      | Kafka 토픽 생성                   |
+| `kafka:produce`     | 테스트 이벤트 발행                |
+| `kafka:consume`     | 테스트 이벤트 소비                |
+| `kafka:consume:dlq` | DLQ 이벤트 소비                   |
+| `kafka:test`        | Kafka 스모크 테스트 실행          |
+| `release:dry-run`   | semantic-release 시뮬레이션       |
+| `release`           | semantic-release 실제 실행        |
+
+### 2-1) Workspace(모노레포)
+
+- 루트는 워크스페이스 오케스트레이터 역할을 하며, 앱 엔트리는 아래와 같습니다.
+  - `apps/web`: Next.js 워크스페이스 엔트리(실소스는 `apps/web` 기준)
+  - `apps/api`: FastAPI 워크스페이스 엔트리
+  - `packages/contracts`: 웹에서 재사용하는 공용 API 계약(schema/type) 패키지
+- 기본 실행/개발 경로는 `apps/*` 기준으로 통일했습니다.
+- 의존성은 원칙적으로 워크스페이스별로 선언하고, 루트는 오케스트레이션/공용 스크립트용 최소 의존성만 유지합니다.
+
 > `next lint --fix`는 Next 16에서 동작이 달라질 수 있어 본 프로젝트는 **eslint를 직접 실행**합니다.
 
 ---
 
-## 2-1) 환경 변수 / Mock 모드
+## 2-2) 환경 변수 / Mock 모드
 
 Supabase 연동을 사용하려면 아래 환경 변수가 필요합니다.
 
@@ -152,12 +211,12 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 
 환경 변수가 없으면 `/api/projects` 관련 엔드포인트는 **mock 데이터**를 사용합니다.
 
-- mock 데이터는 `src/entities/project/model/mock.ts` 기준
+- mock 데이터는 `apps/web/src/entities/project/model/mock.ts` 기준
 - `POST/PATCH/DELETE`는 성공 응답만 반환하고 **영구 저장은 하지 않습니다**
 
 ---
 
-## 2-2) E2E 백엔드 모드 분리
+## 2-3) E2E 백엔드 모드 분리
 
 E2E 테스트는 `API_BACKEND` 값에 따라 `route` 전용/`fastapi` 전용 케이스로 분리되어 있습니다.
 
@@ -193,7 +252,7 @@ API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run test:e2e
 
 ---
 
-## 2-3) 관측/모니터링
+## 2-4) 관측/모니터링
 
 ### Health Check
 
@@ -201,11 +260,11 @@ API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run test:e2e
 
 - `GET /api/health`
 
-요청에는 `x-request-id`가 자동으로 부여되며 헬스 응답에도 포함됩니다(프록시 경로는 `proxy.ts` 기준).
+요청에는 `x-request-id`가 자동으로 부여되며 헬스 응답에도 포함됩니다(프록시 경로는 `apps/web/proxy.ts` 기준).
 
 ### 구조화 로그 유틸
 
-`src/shared/lib/monitoring/logger.ts`의 유틸을 사용해 기본 JSON 로그를 남길 수 있습니다.
+`apps/web/src/shared/lib/monitoring/logger.ts`의 유틸을 사용해 기본 JSON 로그를 남길 수 있습니다.
 
 자세한 설계는 `docs/observability.md`를 참고하세요.
 
@@ -246,8 +305,8 @@ DSN 확인 위치:
 
 실제 사용 요약:
 
-- `src/instrumentation.ts`에서 런타임별 Sentry 설정을 로딩합니다.
-- `src/instrumentation-client.ts`에서 브라우저 계측(Replay 포함)을 초기화합니다.
+- `apps/web/src/instrumentation.ts`에서 런타임별 Sentry 설정을 로딩합니다.
+- `apps/web/src/instrumentation-client.ts`에서 브라우저 계측(Replay 포함)을 초기화합니다.
 - 직접 에러를 보낼 때는 `Sentry.captureException` 또는 `Sentry.captureMessage`를 사용합니다.
 
 이벤트/로그 확인:
@@ -258,7 +317,7 @@ DSN 확인 위치:
 
 ---
 
-## 2-4) 버전/태그 자동화(semantic-release)
+## 2-5) 버전/태그 자동화(semantic-release)
 
 이 프로젝트는 `main` 브랜치에서 GitLab CI가 `semantic-release`를 실행해 버전을 자동 산정합니다.
 
@@ -339,8 +398,16 @@ npm run release:dry-run
 
 ## 5) 디렉토리 구조
 
-```
-src/
+```text
+apps/
+  web/
+    src/
+    tests/
+  api/
+    app/
+    tests/
+
+apps/web/src/
   app/                    # Next App Router 엔트리
     (marketing)/
     (app)/
@@ -413,8 +480,8 @@ Next 16에서는 `params` / `searchParams`가 **Promise로 타입이 강제**될
 
 ```ts
 export default async function Page({
-                                     searchParams,
-                                   }: {
+  searchParams,
+}: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
@@ -456,8 +523,8 @@ export default async function Page({
 
 ## 10) UI(shadcn) 사용 위치
 
-- `src/shared/ui/shadcn/*`에 shadcn 컴포넌트 래핑(또는 복사)되어 있고
-- `src/shared/ui/index.ts`에서 일괄 export 합니다.
+- `apps/web/src/shared/ui/shadcn/*`에 shadcn 컴포넌트 래핑(또는 복사)되어 있고
+- `apps/web/src/shared/ui/index.ts`에서 일괄 export 합니다.
 
 예:
 
@@ -469,7 +536,7 @@ import { Button, Card, Input, Select } from "@/shared/ui";
 
 ## 11) 참고
 
-- 이 레포의 프로젝트 데이터는 `src/entities/project/model/mock.ts`에 **mock**으로 들어 있습니다.
+- 이 레포의 프로젝트 데이터는 `apps/web/src/entities/project/model/mock.ts`에 **mock**으로 들어 있습니다.
 - 실제 프로젝트에서는 `entities/*/api`에서 BFF(Route Handlers) 또는 외부 API 서버를 붙이면 됩니다.
 
 ---
@@ -512,15 +579,22 @@ npm run kafka:consume:dlq
 ```
 
 1. `kafka:topics`
-  - `projects.project-created.v1`, `events.dlq.v1` 토픽을 생성합니다.
+
+- `projects.project-created.v1`, `events.dlq.v1` 토픽을 생성합니다.
+
 2. `kafka:produce`
-  - 프로젝트 생성 이벤트를 발행합니다.
-  - `project_id`를 key로 사용해 같은 프로젝트 이벤트는 같은 파티션으로 라우팅됩니다.
+
+- 프로젝트 생성 이벤트를 발행합니다.
+- `project_id`를 key로 사용해 같은 프로젝트 이벤트는 같은 파티션으로 라우팅됩니다.
+
 3. `kafka:consume`
-  - 이벤트를 소비하고 정상 처리 시 offset을 커밋합니다.
-  - `force_fail=true` 이벤트는 실패로 간주하고 `events.dlq.v1`로 보냅니다.
+
+- 이벤트를 소비하고 정상 처리 시 offset을 커밋합니다.
+- `force_fail=true` 이벤트는 실패로 간주하고 `events.dlq.v1`로 보냅니다.
+
 4. `kafka:consume:dlq`
-  - DLQ 토픽을 읽어 실패 원인(`reason`)을 확인합니다.
+
+- DLQ 토픽을 읽어 실패 원인(`reason`)을 확인합니다.
 
 #### B. 백엔드 Outbox 연동 로직
 
@@ -535,8 +609,10 @@ POST /api/projects
 
 1. 클라이언트가 `POST /api/projects` 호출
 2. 백엔드 `store.create_project()`에서
-  - 프로젝트 데이터 저장
-  - outbox 이벤트를 `pending` 상태로 함께 저장
+
+- 프로젝트 데이터 저장
+- outbox 이벤트를 `pending` 상태로 함께 저장
+
 3. `OUTBOX_RELAY_ENABLED=true`이면 FastAPI 시작 시 relay worker 실행
 4. relay가 pending/failed outbox를 읽어 Kafka 토픽으로 발행
 5. 발행 성공 시 outbox 상태를 `published`로 변경, 실패 시 `failed` + `attempts` 증가

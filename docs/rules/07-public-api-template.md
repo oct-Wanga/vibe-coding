@@ -1,8 +1,8 @@
 ---
 description: "Public API 규칙: index.ts export 정책/허용 패턴/금지 패턴"
 globs:
-  - "src/**/index.ts"
-  - "src/**/*.{ts,tsx}"
+  - "apps/web/src/**/index.ts"
+  - "apps/web/src/**/*.{ts,tsx}"
 ---
 
 # Public API Rules (index.ts)

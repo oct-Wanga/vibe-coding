@@ -1,7 +1,7 @@
 ---
 description: "Tech Stack: 승인된 라이브러리/금지 대체재/도입 원칙"
 globs:
-  - "src/**/*.{ts,tsx}"
+  - "apps/web/src/**/*.{ts,tsx}"
 ---
 
 # Tech Stack Rules

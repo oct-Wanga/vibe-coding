@@ -2,8 +2,8 @@
 alwaysApply: false
 description: "Routing/Naming Rules: route groups, segments, 파일/폴더 네이밍"
 globs:
-  - "src/app/**/*"
-  - "src/views/**/*"
+  - "apps/web/src/app/**/*"
+  - "apps/web/src/views/**/*"
 ---
 
 # Routing & Naming Rules

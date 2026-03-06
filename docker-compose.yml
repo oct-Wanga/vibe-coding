@@ -12,8 +12,8 @@ services:
     env_file:
       - .env.local
     volumes:
-      - ./backend:/app
-    command: sh -c "pip install -r requirements.txt && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+      - ./apps/api:/app
+    command: sh -c "pip install -r /app/requirements.txt && uvicorn app.main:app --host 0.0.0.0 --port 8000"
     environment:
       SESSION_STORE_BACKEND: redis
       REDIS_URL: redis://redis:6379/0
@@ -39,7 +39,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: apps/web/Dockerfile
       args:
         API_BACKEND: fastapi
         FASTAPI_BASE_URL: http://api:8000
