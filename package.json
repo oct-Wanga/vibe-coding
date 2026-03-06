@@ -28,6 +28,8 @@
     "test:e2e:ui": "npm --workspace @apps/web run test:e2e -- --ui",
     "kafka:up": "docker compose -f docker-compose.kafka.yml up -d",
     "kafka:up:all": "docker compose -f docker-compose.yml -f docker-compose.kafka.yml up -d",
+    "containers:up": "docker compose -f docker-compose.yml -f docker-compose.kafka.yml up -d",
+    "containers:down": "docker compose -f docker-compose.yml -f docker-compose.kafka.yml down -v",
     "kafka:down": "docker compose -f docker-compose.kafka.yml down -v",
     "kafka:topics": "node scripts/kafka/create-topics.mjs",
     "kafka:produce": "node scripts/kafka/produce-project-events.mjs",
