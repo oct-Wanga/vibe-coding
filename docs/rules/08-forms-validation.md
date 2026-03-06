@@ -1,7 +1,7 @@
 ---
 description: "Forms & Validation: react-hook-form + zod 강제"
 globs:
-  - "src/**/*.{ts,tsx}"
+  - "apps/web/src/**/*.{ts,tsx}"
 ---
 
 # Forms & Validation Rules

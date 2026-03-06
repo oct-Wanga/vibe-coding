@@ -145,7 +145,7 @@ npm run release         # semantic-release 실행
 ### 2-1) Workspace(모노레포 1단계)
 
 - 루트는 워크스페이스 오케스트레이터 역할을 하며, 앱 엔트리는 아래와 같습니다.
-  - `apps/web`: Next.js 워크스페이스 엔트리(실소스는 루트 기준 유지)
+  - `apps/web`: Next.js 워크스페이스 엔트리(실소스는 `apps/web` 기준)
   - `apps/api`: FastAPI 워크스페이스 엔트리
 - 점진적으로 `apps/*`, `packages/*` 구조로 이동할 수 있도록 1단계 레이아웃을 적용했습니다.
 
@@ -166,7 +166,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 
 환경 변수가 없으면 `/api/projects` 관련 엔드포인트는 **mock 데이터**를 사용합니다.
 
-- mock 데이터는 `src/entities/project/model/mock.ts` 기준
+- mock 데이터는 `apps/web/src/entities/project/model/mock.ts` 기준
 - `POST/PATCH/DELETE`는 성공 응답만 반환하고 **영구 저장은 하지 않습니다**
 
 ---
@@ -219,7 +219,7 @@ API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run test:e2e
 
 ### 구조화 로그 유틸
 
-`src/shared/lib/monitoring/logger.ts`의 유틸을 사용해 기본 JSON 로그를 남길 수 있습니다.
+`apps/web/src/shared/lib/monitoring/logger.ts`의 유틸을 사용해 기본 JSON 로그를 남길 수 있습니다.
 
 자세한 설계는 `docs/observability.md`를 참고하세요.
 
@@ -260,8 +260,8 @@ DSN 확인 위치:
 
 실제 사용 요약:
 
-- `src/instrumentation.ts`에서 런타임별 Sentry 설정을 로딩합니다.
-- `src/instrumentation-client.ts`에서 브라우저 계측(Replay 포함)을 초기화합니다.
+- `apps/web/src/instrumentation.ts`에서 런타임별 Sentry 설정을 로딩합니다.
+- `apps/web/src/instrumentation-client.ts`에서 브라우저 계측(Replay 포함)을 초기화합니다.
 - 직접 에러를 보낼 때는 `Sentry.captureException` 또는 `Sentry.captureMessage`를 사용합니다.
 
 이벤트/로그 확인:
@@ -354,7 +354,7 @@ npm run release:dry-run
 ## 5) 디렉토리 구조
 
 ```
-src/
+apps/web/src/
   app/                    # Next App Router 엔트리
     (marketing)/
     (app)/
@@ -470,8 +470,8 @@ export default async function Page({
 
 ## 10) UI(shadcn) 사용 위치
 
-- `src/shared/ui/shadcn/*`에 shadcn 컴포넌트 래핑(또는 복사)되어 있고
-- `src/shared/ui/index.ts`에서 일괄 export 합니다.
+- `apps/web/src/shared/ui/shadcn/*`에 shadcn 컴포넌트 래핑(또는 복사)되어 있고
+- `apps/web/src/shared/ui/index.ts`에서 일괄 export 합니다.
 
 예:
 
@@ -483,7 +483,7 @@ import { Button, Card, Input, Select } from "@/shared/ui";
 
 ## 11) 참고
 
-- 이 레포의 프로젝트 데이터는 `src/entities/project/model/mock.ts`에 **mock**으로 들어 있습니다.
+- 이 레포의 프로젝트 데이터는 `apps/web/src/entities/project/model/mock.ts`에 **mock**으로 들어 있습니다.
 - 실제 프로젝트에서는 `entities/*/api`에서 BFF(Route Handlers) 또는 외부 API 서버를 붙이면 됩니다.
 
 ---

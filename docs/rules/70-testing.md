@@ -2,10 +2,10 @@
 alwaysApply: false
 description: "Testing: vitest + Playwright(TDD), config/scripts 제한, 실데이터, data-testid"
 globs:
-  - "tests/**/*.{ts,tsx}"
-  - "playwright.config.ts"
+  - "apps/web/tests/**/*.{ts,tsx}"
+  - "apps/web/playwright.config.ts"
   - "package.json"
-  - "src/**/*.{ts,tsx}"
+  - "apps/web/src/**/*.{ts,tsx}"
 ---
 
 # Testing Rules (Unit + E2E)
@@ -22,7 +22,7 @@ globs:
 
 ## 2) Playwright 설정/실행 규칙
 
-- `playwright.config.ts` 설정은 **변경하지 말 것.**
+- `apps/web/playwright.config.ts` 설정은 **변경하지 말 것.**
 - Playwright 테스트는 `package.json`의 scripts에 등록된 명령으로만 실행할 것.
   - 새 실행 명령을 임의로 추가하지 말 것(정말 필요하면 팀 합의가 우선).
 

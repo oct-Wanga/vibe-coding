@@ -1,7 +1,7 @@
 ---
 description: "State: React Query/Zustand/URL, provider 위치, queryKey 규칙"
 globs:
-  - "src/**/*.{ts,tsx}"
+  - "apps/web/src/**/*.{ts,tsx}"
 ---
 
 # State Management Rules
@@ -18,7 +18,7 @@ globs:
 
 Provider:
 
-- QueryClientProvider는 단일 진입점(권장: `src/app/providers.tsx`)에 1회만 둔다.
+- QueryClientProvider는 단일 진입점(권장: `apps/web/src/app/providers.tsx`)에 1회만 둔다.
 
 ---
 

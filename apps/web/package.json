@@ -2,11 +2,12 @@
   "name": "@apps/web",
   "private": true,
   "scripts": {
-    "dev": "next dev ../../",
-    "build": "next build ../../",
-    "start": "next start ../../",
-    "lint": "eslint ../../",
-    "test": "vitest --config ../../vitest.config.ts",
-    "test:e2e": "playwright test --config ../../playwright.config.ts"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest --config vitest.config.ts",
+    "test:e2e": "playwright test --config playwright.config.ts"
   }
 }
