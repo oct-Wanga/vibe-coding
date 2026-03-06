@@ -94,7 +94,7 @@ npm run kafka:down
 앱(`api/web`) + Kafka를 한 번에 올리려면:
 
 ```bash
-npm run kafka:up:all
+npm run containers:up
 ```
 
 ---
@@ -168,12 +168,11 @@ npm run release         # semantic-release 실행
 | `format:fix`        | 전체 Prettier 자동 수정           |
 | `test`              | 웹 unit 테스트 실행(기본)         |
 | `test:web`          | `apps/web` Vitest 실행            |
-| `test:api`          | `apps/api` pytest 실행 (`--` 뒤 인자 전달 가능) |
+| `test:api`          | `apps/api` pytest 실행 |
 | `test:all`          | 웹 unit + API 테스트 순차 실행    |
 | `test:e2e`          | 웹 Playwright E2E 실행            |
 | `test:e2e:ui`       | 웹 Playwright UI 모드 실행        |
 | `kafka:up`          | Kafka 테스트 인프라 실행          |
-| `kafka:up:all`      | 앱 + Kafka 인프라 동시 실행       |
 | `containers:up`     | 앱 + Kafka 전체 컨테이너 실행     |
 | `kafka:down`        | Kafka 테스트 인프라 종료/정리     |
 | `containers:down`   | 앱 + Kafka 전체 컨테이너 종료/정리 |

@@ -114,7 +114,7 @@ npm run kafka:consume:dlq
 
 백엔드 Outbox 샘플을 함께 켜면, API에서 생성된 outbox 이벤트가 Kafka로 발행됩니다.
 
-- 관련 코드: `backend/app/services/store.py`, `backend/app/services/outbox_relay.py`
+- 관련 코드: `apps/api/app/services/store.py`, `apps/api/app/services/outbox_relay.py`
 - relay 활성화: `OUTBOX_RELAY_ENABLED=true`
 
 ### 6-1) 샘플 스크립트 흐름
