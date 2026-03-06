@@ -12,6 +12,8 @@ globs:
 
 작업이 모두 끝나면 **Conventional Commits** 형식으로 커밋 메시지를 작성한다.
 
+작업량이 많을 경우, `/.gitmessage.txt` 파일을 참고 하여 본문 내용을 작성합니다.
+
 형식:
 
 - `type(scope): subject`
