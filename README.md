@@ -146,37 +146,37 @@ npm run release         # semantic-release 실행
 
 ### 2-0) 스크립트 역할 요약
 
-| 스크립트 | 역할 |
-|---|---|
-| `dev` | 웹 개발 서버 실행(기본) |
-| `dev:web` | `apps/web` Next 개발 서버 실행 |
-| `dev:api` | `apps/api` FastAPI 개발 서버 실행 |
-| `dev:all` | 웹/백엔드 개발 서버 동시 실행 |
-| `build` | 웹 프로덕션 빌드 실행(기본) |
-| `build:web` | `apps/web` 빌드 |
-| `start` | 웹 프로덕션 서버 실행(기본) |
-| `start:web` | `apps/web` 프로덕션 서버 실행 |
-| `lint` | 웹 ESLint 검사(기본) |
-| `lint:web` | `apps/web` ESLint 검사 |
-| `lint:fix` | 웹 ESLint 자동 수정 |
-| `format` | 전체 Prettier 검사 |
-| `format:fix` | 전체 Prettier 자동 수정 |
-| `test` | 웹 unit 테스트 실행(기본) |
-| `test:web` | `apps/web` Vitest 실행 |
-| `test:api` | `apps/api` pytest 실행 |
-| `test:all` | 웹 unit + API 테스트 순차 실행 |
-| `test:e2e` | 웹 Playwright E2E 실행 |
-| `test:e2e:ui` | 웹 Playwright UI 모드 실행 |
-| `kafka:up` | Kafka 테스트 인프라 실행 |
-| `kafka:up:all` | 앱 + Kafka 인프라 동시 실행 |
-| `kafka:down` | Kafka 테스트 인프라 종료/정리 |
-| `kafka:topics` | Kafka 토픽 생성 |
-| `kafka:produce` | 테스트 이벤트 발행 |
-| `kafka:consume` | 테스트 이벤트 소비 |
-| `kafka:consume:dlq` | DLQ 이벤트 소비 |
-| `kafka:test` | Kafka 스모크 테스트 실행 |
-| `release:dry-run` | semantic-release 시뮬레이션 |
-| `release` | semantic-release 실제 실행 |
+| 스크립트            | 역할                              |
+| ------------------- | --------------------------------- |
+| `dev`               | 웹 개발 서버 실행(기본)           |
+| `dev:web`           | `apps/web` Next 개발 서버 실행    |
+| `dev:api`           | `apps/api` FastAPI 개발 서버 실행 |
+| `dev:all`           | 웹/백엔드 개발 서버 동시 실행     |
+| `build`             | 웹 프로덕션 빌드 실행(기본)       |
+| `build:web`         | `apps/web` 빌드                   |
+| `start`             | 웹 프로덕션 서버 실행(기본)       |
+| `start:web`         | `apps/web` 프로덕션 서버 실행     |
+| `lint`              | 웹 ESLint 검사(기본)              |
+| `lint:web`          | `apps/web` ESLint 검사            |
+| `lint:fix`          | 웹 ESLint 자동 수정               |
+| `format`            | 전체 Prettier 검사                |
+| `format:fix`        | 전체 Prettier 자동 수정           |
+| `test`              | 웹 unit 테스트 실행(기본)         |
+| `test:web`          | `apps/web` Vitest 실행            |
+| `test:api`          | `apps/api` pytest 실행            |
+| `test:all`          | 웹 unit + API 테스트 순차 실행    |
+| `test:e2e`          | 웹 Playwright E2E 실행            |
+| `test:e2e:ui`       | 웹 Playwright UI 모드 실행        |
+| `kafka:up`          | Kafka 테스트 인프라 실행          |
+| `kafka:up:all`      | 앱 + Kafka 인프라 동시 실행       |
+| `kafka:down`        | Kafka 테스트 인프라 종료/정리     |
+| `kafka:topics`      | Kafka 토픽 생성                   |
+| `kafka:produce`     | 테스트 이벤트 발행                |
+| `kafka:consume`     | 테스트 이벤트 소비                |
+| `kafka:consume:dlq` | DLQ 이벤트 소비                   |
+| `kafka:test`        | Kafka 스모크 테스트 실행          |
+| `release:dry-run`   | semantic-release 시뮬레이션       |
+| `release`           | semantic-release 실제 실행        |
 
 ### 2-1) Workspace(모노레포)
 
@@ -473,8 +473,8 @@ Next 16에서는 `params` / `searchParams`가 **Promise로 타입이 강제**될
 
 ```ts
 export default async function Page({
-                                     searchParams,
-                                   }: {
+  searchParams,
+}: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
@@ -572,15 +572,22 @@ npm run kafka:consume:dlq
 ```
 
 1. `kafka:topics`
-  - `projects.project-created.v1`, `events.dlq.v1` 토픽을 생성합니다.
+
+- `projects.project-created.v1`, `events.dlq.v1` 토픽을 생성합니다.
+
 2. `kafka:produce`
-  - 프로젝트 생성 이벤트를 발행합니다.
-  - `project_id`를 key로 사용해 같은 프로젝트 이벤트는 같은 파티션으로 라우팅됩니다.
+
+- 프로젝트 생성 이벤트를 발행합니다.
+- `project_id`를 key로 사용해 같은 프로젝트 이벤트는 같은 파티션으로 라우팅됩니다.
+
 3. `kafka:consume`
-  - 이벤트를 소비하고 정상 처리 시 offset을 커밋합니다.
-  - `force_fail=true` 이벤트는 실패로 간주하고 `events.dlq.v1`로 보냅니다.
+
+- 이벤트를 소비하고 정상 처리 시 offset을 커밋합니다.
+- `force_fail=true` 이벤트는 실패로 간주하고 `events.dlq.v1`로 보냅니다.
+
 4. `kafka:consume:dlq`
-  - DLQ 토픽을 읽어 실패 원인(`reason`)을 확인합니다.
+
+- DLQ 토픽을 읽어 실패 원인(`reason`)을 확인합니다.
 
 #### B. 백엔드 Outbox 연동 로직
 
@@ -595,8 +602,10 @@ POST /api/projects
 
 1. 클라이언트가 `POST /api/projects` 호출
 2. 백엔드 `store.create_project()`에서
-  - 프로젝트 데이터 저장
-  - outbox 이벤트를 `pending` 상태로 함께 저장
+
+- 프로젝트 데이터 저장
+- outbox 이벤트를 `pending` 상태로 함께 저장
+
 3. `OUTBOX_RELAY_ENABLED=true`이면 FastAPI 시작 시 relay worker 실행
 4. relay가 pending/failed outbox를 읽어 Kafka 토픽으로 발행
 5. 발행 성공 시 outbox 상태를 `published`로 변경, 실패 시 `failed` + `attempts` 증가

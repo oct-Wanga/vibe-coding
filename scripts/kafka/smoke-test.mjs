@@ -59,7 +59,14 @@ const runWorker = async () => {
   await consumer.run({
     autoCommit: false,
     eachBatchAutoResolve: false,
-    eachBatch: async ({ batch, heartbeat, resolveOffset, commitOffsetsIfNecessary, isRunning, isStale }) => {
+    eachBatch: async ({
+      batch,
+      heartbeat,
+      resolveOffset,
+      commitOffsetsIfNecessary,
+      isRunning,
+      isStale,
+    }) => {
       for (const message of batch.messages) {
         if (!isRunning() || isStale()) {
           break;
@@ -106,7 +113,9 @@ const runWorker = async () => {
 
         const handled = okCount + dlqCount;
         if (handled % 20 === 0 || handled === expectedTotal) {
-          console.log(`[kafka-test] worker progress handled=${handled}/${expectedTotal} (ok=${okCount}, dlq=${dlqCount})`);
+          console.log(
+            `[kafka-test] worker progress handled=${handled}/${expectedTotal} (ok=${okCount}, dlq=${dlqCount})`,
+          );
         }
 
         resolveOffset(message.offset);
@@ -122,7 +131,9 @@ const runWorker = async () => {
         if (scanned > totalMessages * 50) {
           // 토픽이 너무 오래 쌓였을 때 무한 스캔을 방지.
           clearTimeout(timeoutHandle);
-          rejectDone(new Error("too many historical records scanned; clean topic or adjust retention"));
+          rejectDone(
+            new Error("too many historical records scanned; clean topic or adjust retention"),
+          );
           break;
         }
       }
@@ -194,7 +205,9 @@ const main = async () => {
   console.log("[kafka-test] topics ready");
 
   // 2) 테스트 이벤트 발행
-  console.log(`[kafka-test] step 2/3: produce messages (count=${totalMessages}, fail_every=${failEvery}, run_id=${runId})`);
+  console.log(
+    `[kafka-test] step 2/3: produce messages (count=${totalMessages}, fail_every=${failEvery}, run_id=${runId})`,
+  );
   await producer.connect();
   const messages = Array.from({ length: totalMessages }, (_, index) => makeEvent(index));
   await producer.send({ topic: TOPICS.projectsCreated, acks: -1, messages });
