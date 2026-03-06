@@ -2,7 +2,7 @@
 alwaysApply: false
 description: "Ops: caching, env, logging, error, auth unification"
 globs:
-  - "src/**/*.{ts,tsx,js,jsx}"
+  - "apps/web/src/**/*.{ts,tsx,js,jsx}"
 ---
 
 # Operations Rules

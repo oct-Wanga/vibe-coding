@@ -1,7 +1,7 @@
 ---
 description: "Code Style: naming, exports, file naming, client/server suffix"
 globs:
-  - "src/**/*.{ts,tsx}"
+  - "apps/web/src/**/*.{ts,tsx}"
 ---
 
 # Coding Style Rules

@@ -2,7 +2,7 @@
 alwaysApply: false
 description: "Next App Router: app/ responsibilities, page/layout/error/loading"
 globs:
-  - "src/app/**/*.{ts,tsx}"
+  - "apps/web/src/app/**/*.{ts,tsx}"
 ---
 
 # Next App Router Rules (app/)

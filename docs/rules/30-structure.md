@@ -1,7 +1,7 @@
 ---
 description: "FSD structure: responsibilities + 내부 폴더 템플릿 + placement rules"
 globs:
-  - "src/**/*"
+  - "apps/web/src/**/*"
 ---
 
 # FSD Structure Rules

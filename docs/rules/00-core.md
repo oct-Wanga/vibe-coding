@@ -1,7 +1,7 @@
 ---
 description: "Core Rules: layer direction, public API, import boundaries (헌법)"
 globs:
-  - "src/**/*.{ts,tsx,js,jsx}"
+  - "apps/web/src/**/*.{ts,tsx,js,jsx}"
 ---
 
 # Core Architecture Rules (Immutable)

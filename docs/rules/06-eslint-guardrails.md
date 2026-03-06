@@ -1,8 +1,8 @@
 ---
 description: "ESLint Guardrails: boundaries, restricted imports, sort (린트 위반 방지)"
 globs:
-  - "src/**/*.{ts,tsx,js,jsx}"
-  - "eslint.config.{js,mjs,cjs}"
+  - "apps/web/src/**/*.{ts,tsx,js,jsx}"
+  - "apps/web/eslint.config.{js,mjs,cjs}"
 ---
 
 # ESLint Guardrails Rules
