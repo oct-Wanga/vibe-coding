@@ -71,6 +71,34 @@ npm run dev
 - FastAPI에서 `activity_logs`를 Supabase에 기록하려면 아래 환경 변수를 추가로 설정:
   - `SUPABASE_SERVICE_ROLE_KEY=`
 
+---
+
+## 1-3) Kafka 테스트 환경 실행
+
+테스트용으로 `Kafka(KRaft 1 broker) + Schema Registry + Kafka UI`를 별도 compose로 제공합니다.
+
+```bash
+npm run kafka:up
+```
+
+- Kafka Broker: `localhost:9094`
+- Schema Registry: http://localhost:8081
+- Kafka UI: http://localhost:8080
+
+중지/정리:
+
+```bash
+npm run kafka:down
+```
+
+앱(`api/web`) + Kafka를 한 번에 올리려면:
+
+```bash
+npm run kafka:up:all
+```
+
+---
+
 ## 2) Scripts
 
 ```bash
@@ -93,6 +121,16 @@ npm run format:fix
 npm run test            # unit (vitest)
 npm run test:e2e        # e2e (playwright)
 npm run test:e2e:ui
+
+# kafka (로컬 테스트)
+npm run kafka:up
+npm run kafka:topics
+npm run kafka:produce
+npm run kafka:consume
+npm run kafka:consume:dlq
+npm run kafka:test      # 100건 발행 + DLQ 검증 smoke test
+npm run kafka:down
+
 npm run release:dry-run # 릴리즈 시뮬레이션
 npm run release         # semantic-release 실행
 ```
@@ -375,8 +413,8 @@ Next 16에서는 `params` / `searchParams`가 **Promise로 타입이 강제**될
 
 ```ts
 export default async function Page({
-  searchParams,
-}: {
+                                     searchParams,
+                                   }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
@@ -433,3 +471,126 @@ import { Button, Card, Input, Select } from "@/shared/ui";
 
 - 이 레포의 프로젝트 데이터는 `src/entities/project/model/mock.ts`에 **mock**으로 들어 있습니다.
 - 실제 프로젝트에서는 `entities/*/api`에서 BFF(Route Handlers) 또는 외부 API 서버를 붙이면 됩니다.
+
+---
+
+## 12) Kafka 테스트 시나리오
+
+상세 학습 가이드는 `scripts/kafka/README.md`를 참고하세요.
+
+### Kafka 적용 로직(이 프로젝트)
+
+#### 0) 전체 그림
+
+```text
+Client
+  -> FastAPI (/api/projects)
+    -> InMemoryStore (project 저장 + outbox pending 저장)
+      -> OutboxRelay (polling)
+        -> Kafka Topic (projects.project-created.v1)
+          -> Consumer Worker
+            -> [성공] offset commit
+            -> [실패] DLQ Topic (events.dlq.v1)
+```
+
+#### A. 샘플 스크립트 기반 로직
+
+```text
+npm run kafka:topics
+  -> 토픽 생성
+
+npm run kafka:produce
+  -> projects.project-created.v1 이벤트 발행
+
+npm run kafka:consume
+  -> 이벤트 소비
+    -> 정상: 처리 + offset commit
+    -> 실패(force_fail): events.dlq.v1로 이동
+
+npm run kafka:consume:dlq
+  -> DLQ 이벤트/실패 사유 확인
+```
+
+1. `kafka:topics`
+  - `projects.project-created.v1`, `events.dlq.v1` 토픽을 생성합니다.
+2. `kafka:produce`
+  - 프로젝트 생성 이벤트를 발행합니다.
+  - `project_id`를 key로 사용해 같은 프로젝트 이벤트는 같은 파티션으로 라우팅됩니다.
+3. `kafka:consume`
+  - 이벤트를 소비하고 정상 처리 시 offset을 커밋합니다.
+  - `force_fail=true` 이벤트는 실패로 간주하고 `events.dlq.v1`로 보냅니다.
+4. `kafka:consume:dlq`
+  - DLQ 토픽을 읽어 실패 원인(`reason`)을 확인합니다.
+
+#### B. 백엔드 Outbox 연동 로직
+
+```text
+POST /api/projects
+  -> 프로젝트 저장 + outbox(pending) 저장
+    -> relay worker polling
+      -> Kafka publish (projects.project-created.v1)
+        -> 성공: outbox published
+        -> 실패: outbox failed(attempts 증가)
+```
+
+1. 클라이언트가 `POST /api/projects` 호출
+2. 백엔드 `store.create_project()`에서
+  - 프로젝트 데이터 저장
+  - outbox 이벤트를 `pending` 상태로 함께 저장
+3. `OUTBOX_RELAY_ENABLED=true`이면 FastAPI 시작 시 relay worker 실행
+4. relay가 pending/failed outbox를 읽어 Kafka 토픽으로 발행
+5. 발행 성공 시 outbox 상태를 `published`로 변경, 실패 시 `failed` + `attempts` 증가
+6. `GET /api/projects/outbox/summary`로 상태 집계(`pending/failed/published`) 확인
+
+즉, 이 구조는 "API 처리 성공 후 이벤트 유실"을 줄이기 위한 Outbox 패턴의 최소 샘플입니다.
+
+### 빠른 시작
+
+```bash
+npm run kafka:up
+npm run kafka:topics
+npm run kafka:test
+```
+
+`kafka:test`는 아래를 자동으로 수행합니다.
+
+1. 토픽 생성 확인 (`projects.project-created.v1`, `events.dlq.v1`)
+2. 테스트 이벤트 100건 발행 (`FAIL_EVERY=10` 기본)
+3. 컨슈머 처리 중 실패 이벤트를 DLQ로 이동
+4. DLQ 건수 검증 후 성공/실패 출력
+
+### 수동 확인 (학습용)
+
+터미널 A:
+
+```bash
+npm run kafka:consume
+```
+
+터미널 B:
+
+```bash
+npm run kafka:produce
+```
+
+터미널 C:
+
+```bash
+npm run kafka:consume:dlq
+```
+
+### 환경 변수(선택)
+
+- `COUNT`: 발행 건수 (기본 `100`)
+- `FAIL_EVERY`: N건마다 실패 이벤트 주입 (기본 `10`)
+- `RUN_ID`: 실행 식별자(미지정 시 자동 생성)
+- `GROUP_ID`: 컨슈머 그룹 ID(미지정 시 자동 생성)
+- `MAX_MESSAGES`: consumer가 처리 후 종료할 최대 건수 (`0`이면 계속 실행)
+
+### 실행 환경별 Kafka 주소 기준
+
+- 로컬에서 Node 스크립트 실행(`npm run kafka:*`): `localhost:9094`
+- Docker `api` 컨테이너에서 Kafka 접근: `kafka:9092`
+
+`docker-compose.yml`의 `api` 서비스는 위 기준에 맞게
+`OUTBOX_RELAY_ENABLED=true`, `KAFKA_BOOTSTRAP_SERVERS=kafka:9092`로 기본 설정되어 있습니다.
