@@ -144,6 +144,40 @@ npm run release:dry-run # 릴리즈 시뮬레이션
 npm run release         # semantic-release 실행
 ```
 
+### 2-0) 스크립트 역할 요약
+
+| 스크립트 | 역할 |
+|---|---|
+| `dev` | 웹 개발 서버 실행(기본) |
+| `dev:web` | `apps/web` Next 개발 서버 실행 |
+| `dev:api` | `apps/api` FastAPI 개발 서버 실행 |
+| `dev:all` | 웹/백엔드 개발 서버 동시 실행 |
+| `build` | 웹 프로덕션 빌드 실행(기본) |
+| `build:web` | `apps/web` 빌드 |
+| `start` | 웹 프로덕션 서버 실행(기본) |
+| `start:web` | `apps/web` 프로덕션 서버 실행 |
+| `lint` | 웹 ESLint 검사(기본) |
+| `lint:web` | `apps/web` ESLint 검사 |
+| `lint:fix` | 웹 ESLint 자동 수정 |
+| `format` | 전체 Prettier 검사 |
+| `format:fix` | 전체 Prettier 자동 수정 |
+| `test` | 웹 unit 테스트 실행(기본) |
+| `test:web` | `apps/web` Vitest 실행 |
+| `test:api` | `apps/api` pytest 실행 |
+| `test:all` | 웹 unit + API 테스트 순차 실행 |
+| `test:e2e` | 웹 Playwright E2E 실행 |
+| `test:e2e:ui` | 웹 Playwright UI 모드 실행 |
+| `kafka:up` | Kafka 테스트 인프라 실행 |
+| `kafka:up:all` | 앱 + Kafka 인프라 동시 실행 |
+| `kafka:down` | Kafka 테스트 인프라 종료/정리 |
+| `kafka:topics` | Kafka 토픽 생성 |
+| `kafka:produce` | 테스트 이벤트 발행 |
+| `kafka:consume` | 테스트 이벤트 소비 |
+| `kafka:consume:dlq` | DLQ 이벤트 소비 |
+| `kafka:test` | Kafka 스모크 테스트 실행 |
+| `release:dry-run` | semantic-release 시뮬레이션 |
+| `release` | semantic-release 실제 실행 |
+
 ### 2-1) Workspace(모노레포)
 
 - 루트는 워크스페이스 오케스트레이터 역할을 하며, 앱 엔트리는 아래와 같습니다.
