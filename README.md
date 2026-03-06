@@ -136,12 +136,14 @@ npm run test:api -- -vv -s
 
 # kafka (로컬 테스트)
 npm run kafka:up
+npm run containers:up    # 앱+Kafka 전체 컨테이너 실행
 npm run kafka:topics
 npm run kafka:produce
 npm run kafka:consume
 npm run kafka:consume:dlq
 npm run kafka:test      # 100건 발행 + DLQ 검증 smoke test
 npm run kafka:down
+npm run containers:down  # 앱+Kafka 전체 컨테이너 종료/정리
 
 npm run release:dry-run # 릴리즈 시뮬레이션
 npm run release         # semantic-release 실행
@@ -172,7 +174,9 @@ npm run release         # semantic-release 실행
 | `test:e2e:ui`       | 웹 Playwright UI 모드 실행        |
 | `kafka:up`          | Kafka 테스트 인프라 실행          |
 | `kafka:up:all`      | 앱 + Kafka 인프라 동시 실행       |
+| `containers:up`     | 앱 + Kafka 전체 컨테이너 실행     |
 | `kafka:down`        | Kafka 테스트 인프라 종료/정리     |
+| `containers:down`   | 앱 + Kafka 전체 컨테이너 종료/정리 |
 | `kafka:topics`      | Kafka 토픽 생성                   |
 | `kafka:produce`     | 테스트 이벤트 발행                |
 | `kafka:consume`     | 테스트 이벤트 소비                |
