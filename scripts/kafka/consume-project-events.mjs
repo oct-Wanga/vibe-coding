@@ -73,7 +73,14 @@ const main = async () => {
     // 수동 커밋으로 "처리하지 못한 레코드의 오프셋 선커밋"을 방지
     autoCommit: false,
     eachBatchAutoResolve: false,
-    eachBatch: async ({ batch, heartbeat, resolveOffset, commitOffsetsIfNecessary, isRunning, isStale }) => {
+    eachBatch: async ({
+      batch,
+      heartbeat,
+      resolveOffset,
+      commitOffsetsIfNecessary,
+      isRunning,
+      isStale,
+    }) => {
       for (const message of batch.messages) {
         if (!isRunning() || isStale()) {
           break;
