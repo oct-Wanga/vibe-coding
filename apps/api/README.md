@@ -31,7 +31,7 @@ export LOGIN_RATE_LIMIT_WINDOW_SECONDS=60
 export SUPABASE_URL=
 export SUPABASE_SERVICE_ROLE_KEY=
 
-uvicorn app.main:app --reload --port 8000
+python -m uvicorn app.main:app --reload --port 8000
 ```
 
 ### Windows PowerShell
@@ -61,7 +61,7 @@ $env:LOGIN_RATE_LIMIT_WINDOW_SECONDS="60"
 $env:SUPABASE_URL=""
 $env:SUPABASE_SERVICE_ROLE_KEY=""
 
-uvicorn app.main:app --reload --port 8000
+python -m uvicorn app.main:app --reload --port 8000
 ```
 
 ## 2) 환경 변수 메모
