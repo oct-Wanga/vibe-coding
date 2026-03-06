@@ -47,7 +47,7 @@ RedisInsight에서 Redis 연결 시 아래 값을 사용합니다.
 
 ```bash
 # 백엔드
-cd backend
+cd apps/api
 pip install -r requirements.txt
 # Redis가 없으면 세션 저장소를 memory로 지정
 # export SESSION_STORE_BACKEND=memory
@@ -104,13 +104,18 @@ npm run kafka:up:all
 ```bash
 # 개발
 npm run dev
+npm run dev:web
+npm run dev:api
 
 # 빌드
 npm run build
+npm run build:web
 npm run start
+npm run start:web
 
 # 린트(ESLint)
 npm run lint
+npm run lint:web
 npm run lint:fix
 
 # 포맷(Prettier)
@@ -119,6 +124,8 @@ npm run format:fix
 
 # 테스트
 npm run test            # unit (vitest)
+npm run test:web
+npm run test:api
 npm run test:e2e        # e2e (playwright)
 npm run test:e2e:ui
 
@@ -135,11 +142,18 @@ npm run release:dry-run # 릴리즈 시뮬레이션
 npm run release         # semantic-release 실행
 ```
 
+### 2-1) Workspace(모노레포 1단계)
+
+- 루트는 워크스페이스 오케스트레이터 역할을 하며, 앱 엔트리는 아래와 같습니다.
+  - `apps/web`: Next.js 워크스페이스 엔트리(실소스는 루트 기준 유지)
+  - `apps/api`: FastAPI 워크스페이스 엔트리
+- 점진적으로 `apps/*`, `packages/*` 구조로 이동할 수 있도록 1단계 레이아웃을 적용했습니다.
+
 > `next lint --fix`는 Next 16에서 동작이 달라질 수 있어 본 프로젝트는 **eslint를 직접 실행**합니다.
 
 ---
 
-## 2-1) 환경 변수 / Mock 모드
+## 2-2) 환경 변수 / Mock 모드
 
 Supabase 연동을 사용하려면 아래 환경 변수가 필요합니다.
 
@@ -157,7 +171,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 
 ---
 
-## 2-2) E2E 백엔드 모드 분리
+## 2-3) E2E 백엔드 모드 분리
 
 E2E 테스트는 `API_BACKEND` 값에 따라 `route` 전용/`fastapi` 전용 케이스로 분리되어 있습니다.
 
@@ -193,7 +207,7 @@ API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run test:e2e
 
 ---
 
-## 2-3) 관측/모니터링
+## 2-4) 관측/모니터링
 
 ### Health Check
 
@@ -258,7 +272,7 @@ DSN 확인 위치:
 
 ---
 
-## 2-4) 버전/태그 자동화(semantic-release)
+## 2-5) 버전/태그 자동화(semantic-release)
 
 이 프로젝트는 `main` 브랜치에서 GitLab CI가 `semantic-release`를 실행해 버전을 자동 산정합니다.
 

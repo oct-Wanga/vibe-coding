@@ -1,6 +1,6 @@
 # FastAPI Backend
 
-`backend/`는 Frontend(`/api/*`)가 프록시할 수 있는 FastAPI 서버입니다.
+`apps/api`는 Frontend(`/api/*`)가 프록시할 수 있는 FastAPI 서버입니다.
 
 - 기본 주소: `http://localhost:8000`
 - Swagger Docs: `http://localhost:8000/docs`
@@ -11,7 +11,7 @@
 ### macOS/Linux
 
 ```bash
-cd backend
+cd apps/api
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -37,7 +37,7 @@ uvicorn app.main:app --reload --port 8000
 ### Windows PowerShell
 
 ```powershell
-cd backend
+cd apps/api
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
@@ -93,7 +93,7 @@ uvicorn app.main:app --reload --port 8000
 ## 3) 테스트
 
 ```bash
-cd backend
+cd apps/api
 PYTHONPATH=. pytest -q
 ```
 

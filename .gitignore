@@ -46,9 +46,9 @@ next-env.d.ts
 .env.sentry-build-plugin
 
 # python
-backend/.venv/
-backend/__pycache__/
-backend/.pytest_cache/
-backend/**/*.pyc
+apps/api/.venv/
+apps/api/__pycache__/
+apps/api/.pytest_cache/
+apps/api/**/*.pyc
 
 test-results
