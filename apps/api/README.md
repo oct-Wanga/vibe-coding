@@ -72,6 +72,10 @@ python -m uvicorn app.main:app --reload --port 8000
 - `REDIS_URL`: Redis 연결 주소
 - `SESSION_SINGLE_LOGIN`: `true`면 동일 계정 중복 로그인 차단
 - `LOGIN_RATE_LIMIT_MAX_ATTEMPTS`, `LOGIN_RATE_LIMIT_WINDOW_SECONDS`: 로그인 시도 제한 정책
+- `LOGIN_RATE_LIMIT_FALLBACK_TO_MEMORY`
+  - 기본 `false` (권장)
+  - `false`: Redis 장애 시 로그인 제한 저장소 오류(503)를 반환해 장애를 명확히 드러냄
+  - `true`: Redis 장애 시 in-memory fallback으로 계속 동작(장애 완화용)
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
   - 설정 시 `signup/login`은 Supabase Auth를 우선 사용
   - 설정 시 `projects` CRUD도 Supabase `projects` 테이블을 우선 사용
@@ -96,6 +100,13 @@ python -m uvicorn app.main:app --reload --port 8000
 cd apps/api
 PYTHONPATH=. pytest -q
 ```
+
+- 테스트 실행 시 `apps/api/tests/conftest.py`가 `apps/api/.env.test`를 자동 로드합니다.
+- 기본값은 `SESSION_STORE_BACKEND=memory`입니다.
+- Redis 경로까지 검증하려면 `.env.test`를 아래처럼 조정하세요.
+  - `SESSION_STORE_BACKEND=redis`
+  - `REDIS_URL=redis://localhost:6379/0` (호스트 실행)
+  - `REDIS_URL=redis://redis:6379/0` (api 컨테이너 내부 실행)
 
 ## 4) Outbox 동작 확인
 
