@@ -106,6 +106,7 @@ npm run kafka:up:all
 npm run dev
 npm run dev:web
 npm run dev:api
+npm run dev:all      # web+api 동시 실행
 
 # 빌드
 npm run build
@@ -126,6 +127,7 @@ npm run format:fix
 npm run test            # unit (vitest)
 npm run test:web
 npm run test:api
+npm run test:all        # web unit + api test 순차 실행
 npm run test:e2e        # e2e (playwright)
 npm run test:e2e:ui
 

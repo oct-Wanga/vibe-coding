@@ -10,6 +10,7 @@
     "dev": "npm run dev:web",
     "dev:web": "npm --workspace @apps/web run dev",
     "dev:api": "npm --workspace @apps/api run dev",
+    "dev:all": "concurrently -k -n web,api \"npm run dev:web\" \"npm run dev:api\"",
     "build": "npm run build:web",
     "build:web": "npm --workspace @apps/web run build",
     "start": "npm run start:web",
@@ -22,6 +23,7 @@
     "test": "npm run test:web",
     "test:web": "npm --workspace @apps/web run test",
     "test:api": "npm --workspace @apps/api run test",
+    "test:all": "npm run test:web -- --run && npm run test:api",
     "test:e2e": "npm --workspace @apps/web run test:e2e",
     "test:e2e:ui": "npm --workspace @apps/web run test:e2e -- --ui",
     "kafka:up": "docker compose -f docker-compose.kafka.yml up -d",
@@ -39,6 +41,7 @@
     "kafkajs": "^2.2.4"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "prettier": "^3.8.0",
     "dotenv": "^17.2.3"
   }
