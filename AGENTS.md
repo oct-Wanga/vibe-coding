@@ -26,6 +26,9 @@ globs:
   - `docs/rules/05-tech-stack.md` (기술 스택/금지 대체재/도입 원칙)
   - `docs/rules/30-structure.md` (디렉터리 구조)
   - `docs/rules/70-testing.md` (테스트 기준)
+- 모노레포 보완 문서:
+  - `docs/rules/51-backend-api.md` (FastAPI 계층/Redis 장애 처리/테스트 환경)
+  - `docs/rules/52-contracts.md` (packages/contracts 공용 계약 관리)
 - 그 외 규칙 문서도 변경 맥락에 맞게 반드시 확인한다.
 
 ## 0-2) 중복 관리 원칙

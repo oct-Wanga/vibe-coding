@@ -5,6 +5,7 @@ globs:
   - "apps/web/tests/**/*.{ts,tsx}"
   - "apps/web/playwright.config.ts"
   - "package.json"
+  - "apps/web/package.json"
   - "apps/web/src/**/*.{ts,tsx}"
 ---
 
@@ -22,8 +23,9 @@ globs:
 
 ## 2) Playwright 설정/실행 규칙
 
-- `apps/web/playwright.config.ts` 설정은 **변경하지 말 것.**
-- Playwright 테스트는 `package.json`의 scripts에 등록된 명령으로만 실행할 것.
+- `apps/web/playwright.config.ts` 설정 변경은 **원칙적으로 지양**한다.
+  - 단, 모노레포 구조 변경/테스트 인프라 변경으로 반드시 필요할 때는 변경 사유를 문서화하고 팀 합의를 거친다.
+- Playwright 테스트는 루트 `package.json` 또는 `apps/web/package.json`의 scripts에 등록된 명령으로만 실행할 것.
   - 새 실행 명령을 임의로 추가하지 말 것(정말 필요하면 팀 합의가 우선).
 
 ---

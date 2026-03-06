@@ -2,6 +2,7 @@
 alwaysApply: false
 description: "Git: Conventional Commits + 한국어 커밋 + 인코딩 깨짐 대응"
 globs:
+  - "**/*"
 ---
 
 # Git Commit Rules
