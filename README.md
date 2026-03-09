@@ -160,3 +160,4 @@ npm run test:e2e
 ## 8) 아키텍처 다이어그램
 
 - 전체 다이어그램: `docs/architecture.md`
+- 서비스 확장 로드맵: `docs/architecture-roadmap.md`
