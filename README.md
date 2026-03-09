@@ -165,3 +165,8 @@ npm run test:e2e
 ## 9) 협업/Git 가이드
 
 - Git 운용 전략: `docs/git-strategy.md`
+
+## 10) 워크스페이스별 문서
+
+- Web: `apps/web/README.md`
+- API: `apps/api/README.md`
