@@ -161,3 +161,7 @@ npm run test:e2e
 
 - 전체 다이어그램: `docs/architecture.md`
 - 서비스 확장 로드맵: `docs/architecture-roadmap.md`
+
+## 9) 협업/Git 가이드
+
+- Git 운용 전략: `docs/git-strategy.md`
