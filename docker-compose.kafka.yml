@@ -24,11 +24,45 @@ services:
     volumes:
       - kafka_data:/bitnami/kafka
 
+  kafka-topics-init:
+    image: bitnamilegacy/kafka:3.8
+    container_name: kafka-topics-init
+    depends_on:
+      - kafka
+    restart: "no"
+    command:
+      - /bin/bash
+      - -lc
+      - |
+        set -euo pipefail
+        for i in {1..30}; do
+          /opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list >/dev/null 2>&1 && break
+          sleep 2
+        done
+        /opt/bitnami/kafka/bin/kafka-topics.sh \
+          --bootstrap-server kafka:9092 \
+          --create \
+          --if-not-exists \
+          --topic projects.project-created.v1 \
+          --partitions 3 \
+          --replication-factor 1 \
+          --config retention.ms=604800000
+        /opt/bitnami/kafka/bin/kafka-topics.sh \
+          --bootstrap-server kafka:9092 \
+          --create \
+          --if-not-exists \
+          --topic events.dlq.v1 \
+          --partitions 3 \
+          --replication-factor 1 \
+          --config retention.ms=604800000
+        echo "[kafka] topics ready: projects.project-created.v1, events.dlq.v1"
+
   schema-registry:
     image: confluentinc/cp-schema-registry:7.7.1
     container_name: schema-registry
     depends_on:
       - kafka
+      - kafka-topics-init
     ports:
       - "8081:8081"
     environment:
@@ -41,6 +75,7 @@ services:
     container_name: kafka-ui
     depends_on:
       - kafka
+      - kafka-topics-init
       - schema-registry
     ports:
       - "8080:8080"
