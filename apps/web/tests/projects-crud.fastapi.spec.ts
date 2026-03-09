@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import type { Locator } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
 import { isFastApiBackend } from "./backendMode";
@@ -18,6 +19,13 @@ async function ensureAuthenticated(page: Page): Promise<void> {
     data: { email, password },
   });
   expect(loginResponse.ok()).toBeTruthy();
+}
+
+async function openProjectDetail(page: Page, listItem: Locator, projectId: string) {
+  await Promise.all([
+    page.waitForURL(new RegExp(`/projects/${projectId}$`)),
+    listItem.getByRole("link", { name: "Open" }).click(),
+  ]);
 }
 
 test.describe("Projects CRUD (/projects, fastapi)", () => {
@@ -41,7 +49,7 @@ test.describe("Projects CRUD (/projects, fastapi)", () => {
     const listItem = page.locator("li", { hasText: projectName });
     await expect(listItem).toBeVisible();
 
-    await listItem.getByRole("link", { name: "Open" }).click();
+    await openProjectDetail(page, listItem, uniqueId);
     await expect(page.getByRole("heading", { name: projectName })).toBeVisible();
 
     await page.getByRole("textbox").first().fill(updatedName);
@@ -80,7 +88,7 @@ test.describe("Projects CRUD (/projects, fastapi)", () => {
     const listItem = page.locator("li", { hasText: projectName });
     await expect(listItem).toBeVisible();
 
-    await listItem.getByRole("link", { name: "Open" }).click();
+    await openProjectDetail(page, listItem, uniqueId);
     const deleteResponsePromise = page.waitForResponse(
       (response) =>
         response.request().method() === "DELETE" &&
