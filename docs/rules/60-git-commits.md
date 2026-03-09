@@ -11,6 +11,8 @@ globs:
 
 ## 1) Conventional Commits 규칙
 
+커밋을 작성하기 전, feature 단위 일 경우, rebase 진행 후 커밋메시지를 작성한다.
+
 작업이 모두 끝나면 **Conventional Commits** 형식으로 커밋 메시지를 작성한다.
 
 작업량이 많을 경우, `/.gitmessage.txt` 파일을 참고 하여 본문 내용을 작성합니다.
@@ -45,5 +47,11 @@ globs:
   - 마지막 커밋 메시지 수정(amend)
   - 또는 revert 후 재커밋
 - 팀 정책이 “rewrite 금지”면 amend 대신 추가 커밋으로 교정한다.
+
+---
+
+## 4) MR 작성시
+
+- .gitlab/merge_request_templates/default.md 파일의 양식에 맞춰서 작성한다.
 
 ---
