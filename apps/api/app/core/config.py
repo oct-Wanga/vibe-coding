@@ -29,6 +29,16 @@ class Settings(BaseSettings):
     outbox_relay_poll_interval_seconds: float = 1.0
     outbox_relay_batch_size: int = 100
     outbox_relay_max_attempts: int = 10
+
+    sentry_dsn: str | None = None
+    sentry_environment: str | None = None
+    sentry_release: str | None = None
+    sentry_traces_sample_rate: float = 0.1
+    sentry_profiles_sample_rate: float = 0.0
+    sentry_send_default_pii: bool = False
+
+    api_access_log_enabled: bool = True
+    api_access_log_slow_ms: int = 1000
     kafka_bootstrap_servers: str = "localhost:9092"
     kafka_projects_created_topic: str = "projects.project-created.v1"
     kafka_client_id: str = "fastapi-outbox-relay"
