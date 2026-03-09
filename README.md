@@ -102,7 +102,6 @@ npm run dev:all
 
 # test
 npm run test
-npm run test:web
 npm run test:api
 npm run test:all
 npm run test:e2e
