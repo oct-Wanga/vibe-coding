@@ -1,14 +1,23 @@
-# FastAPI Backend
+# FastAPI Backend (`apps/api`)
 
-`apps/api`는 Frontend(`/api/*`)가 프록시할 수 있는 FastAPI 서버입니다.
+`apps/api`는 이 모노레포의 백엔드 서비스입니다.
+웹(`apps/web`)은 `/api/*` 경로에서 이 서비스를 직접 호출하거나 프록시할 수 있습니다.
 
-- 기본 주소: `http://localhost:8000`
-- Swagger Docs: `http://localhost:8000/docs`
-- API Prefix: `/api`
+- Base URL: `http://localhost:8000`
+- Docs: `http://localhost:8000/docs`
+- Prefix: `/api`
 
-## 1) 로컬 실행
+## 1) 백엔드 역할
 
-### macOS/Linux
+- 인증(`signup/login`) 처리
+- 세션 저장소(memory/redis) 관리
+- 로그인 시도 제한(rate limit)
+- 프로젝트 CRUD
+- Outbox 이벤트 저장 및(옵션) Kafka relay
+
+## 2) 실행
+
+### 2-1) macOS/Linux
 
 ```bash
 cd apps/api
@@ -16,25 +25,16 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-# Redis 없이 실행하려면 memory 권장
+# 로컬 최소 실행(권장 시작점)
 export SESSION_STORE_BACKEND=memory
-
-# Redis 사용 시
-# export SESSION_STORE_BACKEND=redis
-# export REDIS_URL=redis://localhost:6379/0
-
 export SESSION_SINGLE_LOGIN=true
 export LOGIN_RATE_LIMIT_MAX_ATTEMPTS=5
 export LOGIN_RATE_LIMIT_WINDOW_SECONDS=60
 
-# 선택(Supabase Auth/로그)
-export SUPABASE_URL=
-export SUPABASE_SERVICE_ROLE_KEY=
-
 python -m uvicorn app.main:app --reload --port 8000
 ```
 
-### Windows PowerShell
+### 2-2) Windows PowerShell
 
 ```powershell
 cd apps/api
@@ -42,75 +42,79 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 
-# Redis 없이 실행하려면 memory 권장
+# 로컬 최소 실행(권장 시작점)
 $env:SESSION_STORE_BACKEND="memory"
-
-# Redis 사용 시
-# $env:SESSION_STORE_BACKEND="redis"
-# $env:REDIS_URL="redis://localhost:6379/0"
-
-# 선택(Outbox relay -> Kafka)
-# $env:OUTBOX_RELAY_ENABLED="true"
-# $env:KAFKA_BOOTSTRAP_SERVERS="localhost:9094"
-
 $env:SESSION_SINGLE_LOGIN="true"
 $env:LOGIN_RATE_LIMIT_MAX_ATTEMPTS="5"
 $env:LOGIN_RATE_LIMIT_WINDOW_SECONDS="60"
 
-# 선택(Supabase Auth/로그)
-$env:SUPABASE_URL=""
-$env:SUPABASE_SERVICE_ROLE_KEY=""
-
 python -m uvicorn app.main:app --reload --port 8000
 ```
 
-## 2) 환경 변수 메모
+## 3) Redis/Kafka 포함 실행
 
-- `SESSION_STORE_BACKEND`
-  - `memory`: Redis 없이 개발할 때 권장
-  - `redis`: Redis 세션 저장소 사용
-- `REDIS_URL`: Redis 연결 주소
-- `SESSION_SINGLE_LOGIN`: `true`면 동일 계정 중복 로그인 차단
-- `LOGIN_RATE_LIMIT_MAX_ATTEMPTS`, `LOGIN_RATE_LIMIT_WINDOW_SECONDS`: 로그인 시도 제한 정책
+### 3-1) Redis 세션 저장소 사용
+
+```bash
+# Linux/macOS
+export SESSION_STORE_BACKEND=redis
+export REDIS_URL=redis://localhost:6379/0
+```
+
+```powershell
+# PowerShell
+$env:SESSION_STORE_BACKEND="redis"
+$env:REDIS_URL="redis://localhost:6379/0"
+```
+
+### 3-2) Outbox relay -> Kafka 사용
+
+```bash
+# Linux/macOS
+export OUTBOX_RELAY_ENABLED=true
+export KAFKA_BOOTSTRAP_SERVERS=localhost:9094
+```
+
+```powershell
+# PowerShell
+$env:OUTBOX_RELAY_ENABLED="true"
+$env:KAFKA_BOOTSTRAP_SERVERS="localhost:9094"
+```
+
+컨테이너 기반으로는 루트에서 `docker compose up --build` 또는 `npm run containers:up`을 사용하면 됩니다.
+
+## 4) 주요 환경 변수
+
+- `SESSION_STORE_BACKEND`: `memory` | `redis`
+- `REDIS_URL`: Redis 연결 문자열
+- `SESSION_SINGLE_LOGIN`: 동일 계정 중복 로그인 차단 여부
+- `LOGIN_RATE_LIMIT_MAX_ATTEMPTS`, `LOGIN_RATE_LIMIT_WINDOW_SECONDS`: 로그인 제한 정책
 - `LOGIN_RATE_LIMIT_FALLBACK_TO_MEMORY`
   - 기본 `false` (권장)
-  - `false`: Redis 장애 시 로그인 제한 저장소 오류(503)를 반환해 장애를 명확히 드러냄
-  - `true`: Redis 장애 시 in-memory fallback으로 계속 동작(장애 완화용)
+  - `false`: Redis 장애를 명시적 오류로 노출
+  - `true`: in-memory fallback으로 완화
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
-  - 설정 시 `signup/login`은 Supabase Auth를 우선 사용
-  - 설정 시 `projects` CRUD도 Supabase `projects` 테이블을 우선 사용
-  - 미설정 시 사용자/프로젝트는 in-memory 저장소를 사용
-- `OUTBOX_ENABLED`
-  - 기본 `true`
-  - `create project` 시 outbox 이벤트를 함께 기록
-- `OUTBOX_RELAY_ENABLED`
-  - 기본 `false`
-  - `true`일 때 FastAPI 시작 시 relay worker가 pending outbox를 Kafka로 전송
-- `KAFKA_BOOTSTRAP_SERVERS`
-  - 로컬 직접 실행 기본 `localhost:9094`
-  - Docker `api` 컨테이너 실행 시 `kafka:9092`
-- `KAFKA_PROJECTS_CREATED_TOPIC`
-  - 기본 `projects.project-created.v1`
-- `OUTBOX_RELAY_POLL_INTERVAL_SECONDS`, `OUTBOX_RELAY_BATCH_SIZE`, `OUTBOX_RELAY_MAX_ATTEMPTS`
-  - relay polling/batch/retry 제어
+  - 설정 시 Auth/프로젝트 저장을 Supabase 우선 사용
+  - 미설정 시 in-memory 저장소 동작
+- `OUTBOX_ENABLED`: 기본 `true`
+- `OUTBOX_RELAY_ENABLED`: 기본 `false`
+- `KAFKA_BOOTSTRAP_SERVERS`: 로컬 `localhost:9094`, 컨테이너 `kafka:9092`
+- `KAFKA_PROJECTS_CREATED_TOPIC`: 기본 `projects.project-created.v1`
 
-## 3) 테스트
+## 5) 테스트
 
 ```bash
 cd apps/api
 PYTHONPATH=. pytest -q
 ```
 
-- 테스트 실행 시 `apps/api/tests/conftest.py`가 `apps/api/.env.test`를 자동 로드합니다.
-- 기본값은 `SESSION_STORE_BACKEND=memory`입니다.
-- Redis 경로까지 검증하려면 `.env.test`를 아래처럼 조정하세요.
-  - `SESSION_STORE_BACKEND=redis`
-  - `REDIS_URL=redis://localhost:6379/0` (호스트 실행)
-  - `REDIS_URL=redis://redis:6379/0` (api 컨테이너 내부 실행)
+- 테스트 환경의 SSOT는 `apps/api/.env.test`
+- `tests/conftest.py`에서 `.env.test`를 로드
+- Redis 경로까지 검증하려면 `.env.test`에서 `SESSION_STORE_BACKEND=redis`와 `REDIS_URL`을 맞춰 실행
 
-## 4) Outbox 동작 확인
+## 6) Outbox 확인
 
-1. 프로젝트 생성
+프로젝트 생성:
 
 ```bash
 curl -X POST http://localhost:8000/api/projects \
@@ -118,7 +122,7 @@ curl -X POST http://localhost:8000/api/projects \
   -d '{"id":"obx-1","name":"Outbox sample"}'
 ```
 
-2. outbox 요약 확인
+요약 확인:
 
 ```bash
 curl http://localhost:8000/api/projects/outbox/summary
