@@ -73,10 +73,12 @@ git push --force-with-lease
 팀 기본값은 아래 중 하나로 고정:
 
 1. `Squash and merge` 권장
+
 - 장점: `main` 히스토리 간결, 릴리즈 노트 관리 쉬움
 - 조건: MR 본문에 변경 맥락을 충분히 기록
 
 2. `Merge commit` 대안
+
 - 장점: 분기 맥락 보존
 - 단점: 히스토리 복잡도 증가
 
