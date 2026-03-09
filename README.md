@@ -6,6 +6,7 @@
 - `apps/api`: FastAPI 백엔드(인증/세션/프로젝트 API)
 - `Redis`: 세션/로그인 제한 저장소
 - `Kafka`: Outbox relay 기반 비동기 이벤트 실험
+- `Sentry`: FE/BE 에러 및 성능 모니터링
 - `packages/contracts`: FE/BE 공용 계약(schema/type)
 
 즉, 이 프로젝트의 스토리는
@@ -101,7 +102,6 @@ npm run dev:all
 
 # test
 npm run test
-npm run test:web
 npm run test:api
 npm run test:all
 npm run test:e2e
@@ -143,6 +143,17 @@ npm run test:e2e
 - API 인증/저장 연동: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
 - API 세션 저장소: `SESSION_STORE_BACKEND=memory|redis`
 - Kafka relay: `OUTBOX_RELAY_ENABLED`, `KAFKA_BOOTSTRAP_SERVERS`
+- Sentry(FE): `NEXT_PUBLIC_SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_ENVIRONMENT`, `NEXT_PUBLIC_SENTRY_RELEASE`
+- Sentry(BE): `SENTRY_DSN`, `SENTRY_ENVIRONMENT`, `SENTRY_RELEASE`
+
+## 6-1) Sentry 수집 범위
+
+- FE(`apps/web`)
+  - 수집: 브라우저 런타임 예외, App Router request error, 샘플링된 성능 트랜잭션
+  - 비수집(일반): 비밀번호 오입력 같은 정상 비즈니스 실패(예: 401/400 응답)
+- BE(`apps/api`)
+  - 수집: 미처리 예외/오류 로그, 샘플링된 API 트랜잭션
+  - 제외: `/api/health` 트랜잭션(노이즈 방지)
 
 세부는 각 문서 참고:
 

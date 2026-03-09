@@ -100,6 +100,27 @@ $env:KAFKA_BOOTSTRAP_SERVERS="localhost:9094"
 - `OUTBOX_RELAY_ENABLED`: 기본 `false`
 - `KAFKA_BOOTSTRAP_SERVERS`: 로컬 `localhost:9094`, 컨테이너 `kafka:9092`
 - `KAFKA_PROJECTS_CREATED_TOPIC`: 기본 `projects.project-created.v1`
+- `API_ACCESS_LOG_ENABLED`: 기본 `true`, API 요청 접근 로그 출력 여부
+- `API_ACCESS_LOG_SLOW_MS`: 기본 `1000`, 지정 시간(ms) 이상 요청을 warning 레벨로 기록
+- `SENTRY_DSN`: 설정 시 Sentry 활성화(미설정 시 비활성)
+- `SENTRY_ENVIRONMENT`: 기본값은 `APP_ENV`
+- `SENTRY_RELEASE`: 배포 버전 태그(선택)
+- `SENTRY_TRACES_SAMPLE_RATE`: 성능 트랜잭션 샘플링(기본 `0.1`)
+- `SENTRY_PROFILES_SAMPLE_RATE`: 프로파일링 샘플링(기본 `0.0`)
+- `SENTRY_SEND_DEFAULT_PII`: 개인정보 전송 여부(기본 `false`)
+
+Sentry는 `SENTRY_DSN`이 비어 있으면 비활성입니다.
+운영/스테이징에서 DSN을 설정한 뒤 예외가 발생하면 Sentry 웹 콘솔(`sentry.io`)의 해당 프로젝트 `Issues`에서 확인할 수 있습니다.
+
+Sentry 수집 범위:
+
+- 수집:
+  - 미처리 예외(주로 500)
+  - 오류 레벨 로그(`event_level=ERROR`)
+  - 샘플링된 성능 트랜잭션
+- 제외/비수집(일반):
+  - `/api/health` 트랜잭션
+  - 정상 비즈니스 실패 응답(예: 인증 실패 401, 검증 실패 400)
 
 ## 5) 테스트
 

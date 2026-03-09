@@ -1,0 +1,18 @@
+import * as Sentry from "@sentry/nextjs";
+
+const tracesSampleRate = Number.parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE ?? "0.1");
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN ?? process.env.NEXT_PUBLIC_SENTRY_DSN,
+  environment: process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV,
+  release: process.env.SENTRY_RELEASE ?? process.env.NEXT_PUBLIC_SENTRY_RELEASE,
+  tracesSampleRate,
+  sendDefaultPii: false,
+  beforeSendTransaction(event) {
+    const url = event.request?.url;
+    if (url && url.includes("/api/health")) {
+      return null;
+    }
+    return event;
+  },
+});

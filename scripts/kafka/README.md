@@ -30,9 +30,12 @@ Kafka는 "웹/백엔드 기본 실행"의 필수 요소가 아니라,
 
 ```bash
 npm run kafka:up
-npm run kafka:topics
 npm run kafka:test
 ```
+
+`kafka:up`에는 토픽 bootstrap 컨테이너(`kafka-topics-init`)가 포함되어 있어
+기본 토픽(`projects.project-created.v1`, `events.dlq.v1`)은 자동 생성됩니다.
+`npm run kafka:topics`는 수동 재생성이 필요할 때만 사용하세요.
 
 UI:
 

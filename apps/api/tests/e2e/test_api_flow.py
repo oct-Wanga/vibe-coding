@@ -44,3 +44,18 @@ def test_cors_allows_configured_origin() -> None:
         },
     )
     assert response.headers.get("access-control-allow-origin") == "http://localhost:3000"
+
+
+def test_request_id_is_propagated_to_health_response() -> None:
+    client = TestClient(app)
+    response = client.get("/api/health", headers={"x-request-id": "req-health-123"})
+    assert response.status_code == 200
+    assert response.headers.get("x-request-id") == "req-health-123"
+    assert response.json()["request_id"] == "req-health-123"
+
+
+def test_request_id_is_set_for_not_found_response() -> None:
+    client = TestClient(app)
+    response = client.get("/api/not-found", headers={"x-request-id": "req-not-found-123"})
+    assert response.status_code == 404
+    assert response.headers.get("x-request-id") == "req-not-found-123"

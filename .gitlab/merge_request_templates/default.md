@@ -2,11 +2,11 @@
 
 ## 배경 / 문제 (Why)
 
-- 
+-
 
 ## 변경 내용 (What)
 
-- 
+-
 
 ## 영향 범위 (Scope)
 
@@ -26,6 +26,7 @@
 npm run lint
 npm run test:web -- --run
 npm run test:api -- -vv -s
+
 ```
 
 ### 검증 결과
@@ -39,11 +40,11 @@ npm run test:api -- -vv -s
 
 ### 리스크
 
-- 
+-
 
 ### 롤백 방법
 
-- 
+-
 
 ## 체크리스트 (Checklist)
 
