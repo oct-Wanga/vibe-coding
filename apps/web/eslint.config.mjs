@@ -143,6 +143,7 @@ const eslintConfig = defineConfig([
             "^not-found\\.(t|j)sx?$",
             "^route\\.(t|j)s$",
             "^middleware\\.(t|j)s$",
+            "^instrumentation-client\\.(t|j)sx?$",
           ],
         },
       ],
