@@ -11,7 +11,7 @@ globs:
 
 ## 1) Conventional Commits 규칙
 
-커밋을 작성하기 전, feature 단위 일 경우, rebase 진행 후 커밋메시지를 작성한다.
+커밋을 작성하기 전, `/git-strategy.md` 확인 후 진행한다.
 
 작업이 모두 끝나면 **Conventional Commits** 형식으로 커밋 메시지를 작성한다.
 
