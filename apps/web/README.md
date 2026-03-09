@@ -44,9 +44,9 @@ npm run dev:web
 
 ```bash
 npm run dev:web
-npm run build:web
-npm run lint:web
-npm run test:web
+npm run build
+npm run lint
+npm run test
 npm run test:e2e
 ```
 
