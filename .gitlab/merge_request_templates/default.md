@@ -26,6 +26,7 @@
 npm run lint
 npm run test:web -- --run
 npm run test:api -- -vv -s
+
 ```
 
 ### 검증 결과
