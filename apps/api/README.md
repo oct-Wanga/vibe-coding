@@ -112,6 +112,16 @@ $env:KAFKA_BOOTSTRAP_SERVERS="localhost:9094"
 Sentry는 `SENTRY_DSN`이 비어 있으면 비활성입니다.
 운영/스테이징에서 DSN을 설정한 뒤 예외가 발생하면 Sentry 웹 콘솔(`sentry.io`)의 해당 프로젝트 `Issues`에서 확인할 수 있습니다.
 
+Sentry 수집 범위:
+
+- 수집:
+  - 미처리 예외(주로 500)
+  - 오류 레벨 로그(`event_level=ERROR`)
+  - 샘플링된 성능 트랜잭션
+- 제외/비수집(일반):
+  - `/api/health` 트랜잭션
+  - 정상 비즈니스 실패 응답(예: 인증 실패 401, 검증 실패 400)
+
 ## 5) 테스트
 
 ```bash
