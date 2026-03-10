@@ -1,16 +1,20 @@
 from fastapi.testclient import TestClient
+from uuid import uuid4
 
 from app.main import app
 
 
 def test_api_signup_login_and_projects_flow() -> None:
     client = TestClient(app)
+    user_suffix = uuid4().hex[:8]
+    email = f"demo-{user_suffix}@example.com"
+    project_id = f"e2e-{uuid4().hex[:8]}"
 
-    signup = client.post("/api/auth/signup", json={"email": "demo@example.com", "password": "secret123"})
+    signup = client.post("/api/auth/signup", json={"email": email, "password": "secret123"})
     assert signup.status_code == 200
     assert signup.json()["ok"] is True
 
-    login = client.post("/api/auth/login", json={"email": "demo@example.com", "password": "secret123"})
+    login = client.post("/api/auth/login", json={"email": email, "password": "secret123"})
     assert login.status_code == 200
     set_cookie_header = login.headers.get("set-cookie", "")
     assert "session_token=" in set_cookie_header
@@ -21,7 +25,7 @@ def test_api_signup_login_and_projects_flow() -> None:
     assert me.status_code == 200
     assert me.json()["user"] is not None
 
-    create = client.post("/api/projects", json={"id": "e2e-p1", "name": "E2E 프로젝트"})
+    create = client.post("/api/projects", json={"id": project_id, "name": "E2E 프로젝트"})
     assert create.status_code == 201
 
     outbox_summary = client.get("/api/projects/outbox/summary")
@@ -31,7 +35,7 @@ def test_api_signup_login_and_projects_flow() -> None:
 
     list_response = client.get("/api/projects")
     assert list_response.status_code == 200
-    assert any(project["id"] == "e2e-p1" for project in list_response.json())
+    assert any(project["id"] == project_id for project in list_response.json())
 
 
 def test_cors_allows_configured_origin() -> None:
