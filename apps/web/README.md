@@ -1,12 +1,12 @@
 # Web App (`apps/web`)
 
-`apps/web`는 이 모노레포의 Next.js(App Router) 프론트엔드 워크스페이스입니다.
+`apps/web`는 Next.js(App Router) + FSD 구조의 프론트엔드 워크스페이스입니다.
 
 ## 1) 역할
 
-- 사용자 진입 UI 제공
-- FSD 레이어 구조(`app -> views -> widgets -> features -> entities -> shared`) 유지
-- 필요 시 `/api/*` 경로를 통해 FastAPI와 연동
+- 사용자 UI 진입점 제공
+- FSD 레이어(`app -> views -> widgets -> features -> entities -> shared`) 유지
+- 필요 시 `/api/*`를 통해 FastAPI와 연동
 
 ## 2) 실행
 
@@ -24,47 +24,24 @@ npm run dev
 
 - 기본 주소: `http://localhost:3000`
 
-FastAPI 프록시 연동(루트 실행 기준):
+FastAPI 연동 예시:
 
 ```bash
 API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run dev:web
 ```
 
-PowerShell:
-
-```powershell
-$env:API_BACKEND="fastapi"
-$env:FASTAPI_BASE_URL="http://localhost:8000"
-npm run dev:web
-```
-
 ## 3) 주요 스크립트
 
-루트 기준:
-
-```bash
-npm run dev:web
-npm run build
-npm run lint
-npm run test
-npm run test:e2e
-```
-
-워크스페이스 기준:
-
-```bash
-npm run dev
-npm run build
-npm run lint
-npm run test
-npm run test:e2e
-```
+| 위치 | 명령 |
+| --- | --- |
+| 루트 | `npm run dev:web`, `npm run build`, `npm run lint`, `npm run test`, `npm run test:e2e` |
+| 워크스페이스 | `npm run dev`, `npm run build`, `npm run lint`, `npm run test`, `npm run test:e2e` |
 
 ## 4) 테스트
 
 - Unit: Vitest
 - E2E: Playwright
-- E2E 모드 분기:
+- E2E 백엔드 분기:
   - `API_BACKEND=route`
   - `API_BACKEND=fastapi`
 
@@ -77,39 +54,54 @@ API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run test:e2e
 
 ## 5) 환경 변수
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` 또는 `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `API_BACKEND` (`route` | `fastapi`)
-- `FASTAPI_BASE_URL` (예: `http://localhost:8000`)
-- `NEXT_PUBLIC_SENTRY_DSN` (FE SDK)
-- `NEXT_PUBLIC_SENTRY_ENVIRONMENT`, `NEXT_PUBLIC_SENTRY_RELEASE`
-- `NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE`, `NEXT_PUBLIC_SENTRY_PROFILES_SAMPLE_RATE`
-- `SENTRY_DSN` (server/edge SDK, 선택)
-- `SENTRY_ENVIRONMENT`, `SENTRY_RELEASE`
-- `SENTRY_TRACES_SAMPLE_RATE`, `SENTRY_PROFILES_SAMPLE_RATE`
+### 5-1) 파일 위치 / 우선순위
 
-개발 서버(`npm run dev:web`)는 루트 `.env.local`이 아니라 `apps/web/.env.local`을 우선 사용합니다.
+- 웹 개발 서버는 `apps/web/.env.local`을 우선 사용
+- 루트 `.env.local`은 웹 기준 보조 용도(Playwright/E2E)
+- 웹 관련 값은 `apps/web/.env.local` 일원화 권장
 
-## 5-1) Sentry 수집 범위
+### 5-2) 필수(권장) 변수
+
+| 용도 | 변수 |
+| --- | --- |
+| Supabase | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` 또는 `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+| 백엔드 연결 | `API_BACKEND` (`route` \| `fastapi`), `FASTAPI_BASE_URL` |
+
+### 5-3) Sentry 변수
+
+| 영역 | 변수 |
+| --- | --- |
+| FE SDK | `NEXT_PUBLIC_SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_ENVIRONMENT`, `NEXT_PUBLIC_SENTRY_RELEASE`, `NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE`, `NEXT_PUBLIC_SENTRY_PROFILES_SAMPLE_RATE` |
+| server/edge SDK(선택) | `SENTRY_DSN`, `SENTRY_ENVIRONMENT`, `SENTRY_RELEASE`, `SENTRY_TRACES_SAMPLE_RATE`, `SENTRY_PROFILES_SAMPLE_RATE` |
+
+예시(`apps/web/.env.local`):
+
+```env
+API_BACKEND=fastapi
+FASTAPI_BASE_URL=http://localhost:8000
+
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+
+NEXT_PUBLIC_SENTRY_DSN=...
+NEXT_PUBLIC_SENTRY_ENVIRONMENT=local
+NEXT_PUBLIC_SENTRY_RELEASE=web-local
+NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE=0.1
+NEXT_PUBLIC_SENTRY_PROFILES_SAMPLE_RATE=0.0
+```
+
+## 6) Sentry 수집 범위
 
 - 수집:
-  - 브라우저 런타임 예외(예: 렌더링/이벤트 핸들러 오류)
+  - 브라우저 런타임 예외
   - App Router request error (`onRequestError`)
   - 샘플링된 성능 트랜잭션
-- 수집되지 않음(일반):
+- 일반 비수집:
   - 정상 비즈니스 실패 응답(예: 로그인 비밀번호 불일치 401)
   - DSN 미설정 상태
 
-## 6) 개발 규칙
+## 7) 참고 문서
 
-아래 문서를 우선 적용:
-
-- `docs/rules/00-core.md`
-- `docs/rules/05-tech-stack.md`
-- `docs/rules/30-structure.md`
-- `docs/rules/70-testing.md`
-
-전체 구조/아키텍처는 루트 문서 참고:
-
-- `README.md`
-- `docs/architecture.md`
+- 루트 개요: `README.md`
+- 아키텍처: `docs/architecture.md`
+- 관측: `docs/observability.md`
