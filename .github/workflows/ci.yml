@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - "**"
+      - main
   pull_request:
 
 concurrency:
@@ -14,6 +14,7 @@ jobs:
   web-lint:
     name: Web Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,6 +34,7 @@ jobs:
   web-test:
     name: Web Unit Test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -52,6 +54,7 @@ jobs:
   api-test:
     name: API Unit Test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -74,6 +77,7 @@ jobs:
   web-build:
     name: Web Build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: [web-lint, web-test, api-test]
     steps:
       - name: Checkout
@@ -94,6 +98,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: [web-build]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
