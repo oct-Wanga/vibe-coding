@@ -40,6 +40,8 @@ apps/web (Next.js, FSD)
 
 ```bash
 npm i
+cp .env.example .env.local
+cp apps/web/.env.example apps/web/.env.local
 npm run dev
 ```
 

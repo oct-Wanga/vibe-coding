@@ -59,6 +59,7 @@ API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run test:e2e
 - 웹 개발 서버는 `apps/web/.env.local`을 우선 사용
 - 루트 `.env.local`은 웹 기준 보조 용도(Playwright/E2E)
 - 웹 관련 값은 `apps/web/.env.local` 일원화 권장
+- 템플릿: `apps/web/.env.example` -> `apps/web/.env.local` 복사 후 값 입력
 
 ### 5-2) 필수(권장) 변수
 
