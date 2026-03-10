@@ -99,7 +99,7 @@ npm run containers:down
 
 - 워크플로 파일: `.github/workflows/ci.yml`
 - 트리거:
-  - `push` (모든 브랜치)
+  - `push` (`main` 브랜치)
   - `pull_request`
 - 검증 잡:
   - `Web Lint`
@@ -110,6 +110,7 @@ npm run containers:down
   - `main` 브랜치 `push`에서만 실행
   - `semantic-release`로 `vX.Y.Z` 태그 + GitHub Release 생성
   - release job Node 버전: `24`
+  - 주요 잡 timeout: lint/test/release `15분`, build `20분`
 
 ## 6) 테스트 기준
 
