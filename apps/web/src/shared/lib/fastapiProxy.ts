@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 
 const FASTAPI_BASE_URL = process.env.FASTAPI_BASE_URL ?? "http://localhost:8000";
 const REQUEST_ID_HEADER = "x-request-id";
@@ -31,7 +32,10 @@ export async function proxyToFastApi(
       body,
       cache: "no-store",
     });
-  } catch {
+  } catch (error) {
+    const upstreamError =
+      error instanceof Error ? error : new Error("FastAPI upstream request failed");
+    Sentry.captureException(upstreamError);
     const response = NextResponse.json(
       { message: "FastAPI upstream unavailable" },
       { status: 503 },
