@@ -95,7 +95,23 @@ npm run containers:up
 npm run containers:down
 ```
 
-## 5) 테스트 기준
+## 5) CI/CD (GitHub Actions)
+
+- 워크플로 파일: `.github/workflows/ci.yml`
+- 트리거:
+  - `push` (모든 브랜치)
+  - `pull_request`
+- 검증 잡:
+  - `Web Lint`
+  - `Web Unit Test`
+  - `API Unit Test`
+  - `Web Build`
+- 릴리즈:
+  - `main` 브랜치 `push`에서만 실행
+  - `semantic-release`로 `vX.Y.Z` 태그 + GitHub Release 생성
+  - release job Node 버전: `24`
+
+## 6) 테스트 기준
 
 - Web unit: Vitest
 - Web e2e: Playwright
@@ -108,7 +124,7 @@ API_BACKEND=route npm run test:e2e
 API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run test:e2e
 ```
 
-## 6) 환경 변수 핵심
+## 7) 환경 변수 핵심
 
 | 영역 | 핵심 변수 |
 | --- | --- |
@@ -119,7 +135,7 @@ API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run test:e2e
 | Sentry FE | `NEXT_PUBLIC_SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_ENVIRONMENT`, `NEXT_PUBLIC_SENTRY_RELEASE` |
 | Sentry BE | `SENTRY_DSN`, `SENTRY_ENVIRONMENT`, `SENTRY_RELEASE` |
 
-## 7) Sentry 수집 범위
+## 8) Sentry 수집 범위
 
 - FE(`apps/web`)
   - 수집: 브라우저 런타임 예외, App Router request error, 샘플링된 트랜잭션
@@ -128,12 +144,13 @@ API_BACKEND=fastapi FASTAPI_BASE_URL=http://localhost:8000 npm run test:e2e
   - 수집: 미처리 예외/오류 로그, 샘플링된 API 트랜잭션
   - 제외: `/api/health` 트랜잭션
 
-## 8) 문서 맵
+## 9) 문서 맵
 
 - 아키텍처: `docs/architecture.md`
 - 확장 로드맵: `docs/architecture-roadmap.md`
 - 관측: `docs/observability.md`
 - Git 전략: `docs/git-strategy.md`
+- CI 규칙: `docs/rules/71-ci.md`
 - Web 가이드: `apps/web/README.md`
 - API 가이드: `apps/api/README.md`
 - Kafka 가이드: `scripts/kafka/README.md`
