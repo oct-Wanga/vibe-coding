@@ -105,6 +105,7 @@ npm run containers:down
   - `Web Lint`
   - `Web Unit Test`
   - `API Unit Test`
+  - `API Contract Alignment`
   - `Web Build`
 - 릴리즈:
   - `main` 브랜치 `push`에서만 실행
@@ -117,6 +118,7 @@ npm run containers:down
 - Web unit: Vitest
 - Web e2e: Playwright
 - API: pytest
+- API 계약 정합성: `cd apps/api && PYTHONPATH=. pytest -q tests/unit/test_contracts_alignment.py`
 
 E2E 백엔드 분기 예시:
 
