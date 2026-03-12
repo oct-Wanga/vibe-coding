@@ -7,6 +7,8 @@
 - 사용자 UI 진입점 제공
 - FSD 레이어(`app -> views -> widgets -> features -> entities -> shared`) 유지
 - 필요 시 `/api/*`를 통해 FastAPI와 연동
+- BFF 라우트(`src/app/api/**/route.ts`)는 공통 관문(`src/shared/lib/bff/handleBffRoute.ts`)을 통해 백엔드 분기를 수행
+- FastAPI 대상 경로는 `src/shared/config/bffEndpoints.ts`에서 중앙 관리
 
 ## 2) 실행
 
@@ -106,3 +108,4 @@ NEXT_PUBLIC_SENTRY_PROFILES_SAMPLE_RATE=0.0
 - 루트 개요: `README.md`
 - 아키텍처: `docs/architecture.md`
 - 관측: `docs/observability.md`
+

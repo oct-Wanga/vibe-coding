@@ -1,14 +1,15 @@
 import { type NextRequest } from "next/server";
 
-import { isFastApiBackend } from "@/shared/config/apiBackend";
-import { proxyToFastApi } from "@/shared/lib/fastapiProxy";
+import { bffEndpoints } from "@/shared/config/bffEndpoints";
+import { handleBffRoute } from "@/shared/lib/bff/handleBffRoute";
 
 import { POST as localPost } from "./route.local";
 
 export async function POST(request: NextRequest) {
-  if (isFastApiBackend()) {
-    return proxyToFastApi(request, "/api/auth/login");
-  }
-
-  return localPost(request);
+  return handleBffRoute({
+    request,
+    context: undefined,
+    localHandler: (req) => localPost(req),
+    buildTargetPath: () => bffEndpoints.auth.login,
+  });
 }

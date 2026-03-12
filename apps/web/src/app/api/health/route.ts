@@ -1,14 +1,15 @@
 import { type NextRequest } from "next/server";
 
-import { isFastApiBackend } from "@/shared/config/apiBackend";
-import { proxyToFastApi } from "@/shared/lib/fastapiProxy";
+import { bffEndpoints } from "@/shared/config/bffEndpoints";
+import { handleBffRoute } from "@/shared/lib/bff/handleBffRoute";
 
 import { GET as localGet } from "./route.local";
 
 export async function GET(request: NextRequest) {
-  if (isFastApiBackend()) {
-    return proxyToFastApi(request, "/api/health");
-  }
-
-  return localGet();
+  return handleBffRoute({
+    request,
+    context: undefined,
+    localHandler: () => localGet(),
+    buildTargetPath: () => bffEndpoints.health,
+  });
 }
